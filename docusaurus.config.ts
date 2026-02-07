@@ -19,6 +19,7 @@ const config: Config = {
   url: 'https://docs.bffless.com',
   baseUrl: '/',
 
+  trailingSlash: true,
   organizationName: 'bffless',
   projectName: 'bffless',
 

@@ -24,22 +24,15 @@ cd ce
 # Install dependencies
 pnpm install
 
-# Set up environment files
-cp apps/backend/.env.example apps/backend/.env
-cp apps/frontend/.env.example apps/frontend/.env
+# Set up environment file
+cp .env.example .env
 
 # Generate encryption key (required)
 ENCRYPTION_KEY=$(openssl rand -base64 32)
-sed -i.bak "s/^ENCRYPTION_KEY=.*/ENCRYPTION_KEY=$ENCRYPTION_KEY/" apps/backend/.env
-rm apps/backend/.env.bak
+sed -i.bak "s/^ENCRYPTION_KEY=.*/ENCRYPTION_KEY=$ENCRYPTION_KEY/" .env
+rm .env.bak
 
-# Run database migrations
-cd apps/backend
-pnpm db:generate
-pnpm db:migrate
-cd ../..
-
-# Start everything
+# Start everything (runs migrations automatically)
 pnpm dev:full
 ```
 
@@ -195,20 +188,18 @@ pnpm test:e2e -- tests/upload.spec.ts
 
 ## Environment Variables
 
-### Backend (`apps/backend/.env`)
+Configuration is in `.env` at the project root. The backend loads this file automatically.
 
 | Variable | Description | Required |
 |----------|-------------|----------|
-| `ENCRYPTION_KEY` | Encrypts storage credentials | Yes |
-| `DATABASE_URL` | PostgreSQL connection | Yes |
-| `JWT_SECRET` | SuperTokens JWT | Auto-generated |
-| `API_KEY_SALT` | API key hashing | Auto-generated |
+| `ENCRYPTION_KEY` | Encrypts storage credentials in DB | Yes |
+| `DATABASE_URL` | PostgreSQL connection | Has default for local dev |
+| `JWT_SECRET` | SuperTokens JWT secret | Auto-generated |
+| `API_KEY_SALT` | API key hashing salt | Auto-generated |
 
-### Frontend (`apps/frontend/.env`)
+For local development, only `ENCRYPTION_KEY` needs to be set. See `.env.example` for all available options.
 
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `VITE_API_URL` | API base URL | Empty (uses proxy) |
+**Frontend note:** The Vite dev server proxies `/api` requests to the backend, so no frontend `.env` is needed for local development.
 
 ## Docker Development
 

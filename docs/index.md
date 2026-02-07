@@ -65,14 +65,14 @@ flowchart LR
 
 ## Documentation Sections
 
-| Section | Description |
-|---------|-------------|
-| [Getting Started](/getting-started/quickstart) | Installation and setup guides |
-| [Deployment](/deployment/overview) | Deploy to production |
-| [Configuration](/configuration/environment-variables) | Environment variables and settings |
-| [Storage](/storage/overview) | Configure storage backends |
-| [Features](/features/traffic-splitting) | A/B testing, share links, proxy rules |
-| [Reference](/reference/api) | API docs, architecture, database schema |
+| Section                                               | Description                             |
+| ----------------------------------------------------- | --------------------------------------- |
+| [Getting Started](/getting-started/quickstart)        | Installation and setup guides           |
+| [Features](/features/traffic-splitting)               | A/B testing, share links, proxy rules   |
+| [Deployment](/deployment/overview)                    | Deploy to production                    |
+| [Configuration](/configuration/environment-variables) | Environment variables and settings      |
+| [Storage](/storage/overview)                          | Configure storage backends              |
+| [Reference](/reference/api)                           | API docs, architecture, database schema |
 
 ## Need Help?
 
