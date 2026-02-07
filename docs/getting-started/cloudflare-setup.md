@@ -183,9 +183,7 @@ For optimal performance, configure these settings in Cloudflare:
 
 ## Next Steps
 
-- [Configuration](/configuration/environment-variables) - All configuration options
-- [Site Management](/site-management/creating-sites) - Create your first site
-- [CI/CD Integration](/ci-cd/github-actions) - Set up automated deployments
+👉 **[Setup Wizard](/getting-started/setup-wizard)** - Complete the setup wizard to configure storage and create your admin account
 
 ## Troubleshooting
 

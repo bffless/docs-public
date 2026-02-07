@@ -255,9 +255,7 @@ sudo certbot certonly \
 
 ## Next Steps
 
-- [Configuration](/configuration/environment-variables) - All configuration options
-- [SSL Certificates](/deployment/ssl-certificates) - Advanced SSL topics and troubleshooting
-- [CI/CD Integration](/ci-cd/github-actions) - Set up automated deployments
+👉 **[Setup Wizard](/getting-started/setup-wizard)** - Complete the setup wizard to configure storage and create your admin account
 
 ## Troubleshooting
 
