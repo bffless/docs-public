@@ -12,89 +12,57 @@ Deploy BFFless in under 5 minutes using the automated installer.
 
 - A Linux server (Ubuntu 22.04+ recommended)
 - Docker and Docker Compose installed
-- A domain name with DNS pointing to your server
-- Ports 80 and 443 open
+- A domain name
+- Port 443 open (port 80 also needed if not using Cloudflare)
 
-## One-Line Install
+:::tip No Server Yet?
+You can deploy on any cloud provider. A basic $5-10/month VPS from DigitalOcean, Linode, or Hetzner works well for most use cases.
+:::
 
-```bash
-sh -c "$(curl -fsSL https://raw.githubusercontent.com/bffless/ce/main/install.sh)"
+## Choose Your SSL Approach
+
+Both options provide **free SSL certificates**. Choose one to get started:
+
+### Cloudflare (Recommended)
+
+:::tip Why We Recommend Cloudflare
+Cloudflare is the easiest path to production. You get SSL certificates that last 15 years (no renewal headaches), plus free DDoS protection and CDN caching. Most users are up and running in under 10 minutes.
+:::
+
+```mermaid
+flowchart LR
+    User["User"]
+    CF["Cloudflare<br/>(CDN + DDoS Protection)"]
+    Server["Your Server"]
+
+    User -->|"Universal SSL"| CF
+    CF -->|"Origin Certificate"| Server
 ```
 
-The installer will:
-1. Clone the repository
-2. Guide you through configuration
-3. Set up SSL certificates
-4. Start all services
+- SSL certificates with 15-year validity (no renewal needed)
+- DDoS protection and CDN caching included
+- Easy DNS management
+- No certbot or port 80 required
 
-## What You'll Need
+<a href="/getting-started/cloudflare-setup" class="button button--primary button--lg">Get Started with Cloudflare →</a>
 
-During setup, you'll be prompted for:
+---
 
-| Item | Example | Notes |
-|------|---------|-------|
-| Domain name | `example.com` | Must have DNS A records pointing to your server |
-| Email address | `admin@example.com` | For SSL certificate notifications |
+### Let's Encrypt (Alternative)
 
-## After Installation
+```mermaid
+flowchart LR
+    User["User"]
+    Server["Your Server<br/>(Let's Encrypt SSL)"]
 
-Once complete, access your platform at:
-
-- **Admin Panel**: `https://admin.yourdomain.com`
-- **Welcome Page**: `https://www.yourdomain.com`
-- **MinIO Console**: `https://minio.yourdomain.com`
-
-The first time you visit, you'll complete the setup wizard to:
-- Create an admin user
-- Configure storage settings
-- Generate API keys for CI/CD
-
-## Custom Installation
-
-### Specify Installation Directory
-
-```bash
-INSTALL_DIR=/opt/bffless sh -c "$(curl -fsSL https://raw.githubusercontent.com/bffless/ce/main/install.sh)"
+    User -->|"HTTPS"| Server
 ```
 
-### Specify a Branch or Tag
+Use this if you need direct connections without a proxy, or if your organization has policies against third-party CDNs:
 
-```bash
-BRANCH=v1.0.0 sh -c "$(curl -fsSL https://raw.githubusercontent.com/bffless/ce/main/install.sh)"
-```
+- Direct connection to your server (no intermediary)
+- Certificates auto-renew every 90 days
+- Requires port 80 open for verification
+- You manage SSL renewal (automated via cron)
 
-## Next Steps
-
-- [Manual Setup](/getting-started/manual-setup) - Detailed step-by-step installation
-- [Local Development](/getting-started/local-development) - Set up a development environment
-- [Configuration](/configuration/environment-variables) - All configuration options
-
-## Troubleshooting
-
-### DNS Not Propagated
-
-If SSL certificate generation fails, wait 5-30 minutes for DNS to propagate, then re-run the installer.
-
-### Port Already in Use
-
-Ensure ports 80 and 443 are available:
-
-```bash
-# Check what's using the ports
-sudo lsof -i :80
-sudo lsof -i :443
-
-# Stop nginx/apache if running
-sudo systemctl stop nginx apache2
-```
-
-### Docker Not Installed
-
-Install Docker first:
-
-```bash
-curl -fsSL https://get.docker.com -o get-docker.sh
-sh get-docker.sh
-```
-
-For more issues, see the [Troubleshooting Guide](/troubleshooting).
+<a href="/getting-started/letsencrypt-setup" class="button button--secondary button--lg">Get Started with Let's Encrypt →</a>

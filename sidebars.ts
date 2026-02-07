@@ -12,8 +12,13 @@ const sidebars: SidebarsConfig = {
       },
       items: [
         'getting-started/quickstart',
-        'getting-started/manual-setup',
-        'getting-started/local-development',
+        'getting-started/cloudflare-setup',
+        'getting-started/letsencrypt-setup',
+        'getting-started/setup-wizard',
+        'getting-started/first-deployment',
+        'getting-started/viewing-deployments',
+        // 'getting-started/manual-setup',
+        // 'getting-started/local-development',
       ],
     },
     {

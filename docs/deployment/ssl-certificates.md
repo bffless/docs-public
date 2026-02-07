@@ -1,16 +1,28 @@
 ---
 sidebar_position: 4
 title: SSL Certificates
-description: Set up HTTPS for your BFFless deployment
+description: SSL certificate options for your BFFless deployment
 ---
 
 # SSL Certificates
 
-Set up HTTPS for your BFFless deployment.
+This page covers SSL certificate options beyond the recommended Cloudflare approach.
 
-## Quick Setup with Let's Encrypt
+## Recommended: Cloudflare
 
-The recommended approach for production deployments.
+For most self-hosted deployments, we recommend using Cloudflare for SSL. It provides free certificates, DDoS protection, and CDN caching with no renewal hassles.
+
+👉 **[Cloudflare Setup Guide](/getting-started/cloudflare-setup)** - Complete setup instructions
+
+---
+
+## Alternative: Let's Encrypt
+
+If you prefer not to use Cloudflare, you can use Let's Encrypt for free SSL certificates.
+
+👉 **[Let's Encrypt Setup Guide](/getting-started/letsencrypt-setup)** - Complete setup instructions
+
+### Quick Reference
 
 ### Prerequisites
 
@@ -107,6 +119,7 @@ You'll be prompted to add a DNS TXT record. Add it to your DNS provider and wait
 For automatic renewal, use a DNS provider plugin:
 
 **Cloudflare:**
+
 ```bash
 apt install -y python3-certbot-dns-cloudflare
 
@@ -124,6 +137,7 @@ certbot certonly \
 ```
 
 **DigitalOcean:**
+
 ```bash
 apt install -y python3-certbot-dns-digitalocean
 
@@ -154,6 +168,7 @@ chmod 644 ssl/*.pem
 ```
 
 **Required files:**
+
 - `ssl/fullchain.pem` - Full certificate chain (your cert + intermediate certs)
 - `ssl/privkey.pem` - Private key
 
@@ -199,6 +214,7 @@ chmod 644 ssl/*.pem
 ### 3. Update Environment
 
 Edit `.env`:
+
 ```bash
 PRIMARY_DOMAIN=newdomain.com
 FRONTEND_URL=https://www.newdomain.com
