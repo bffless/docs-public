@@ -108,6 +108,31 @@ Your app is now live on your primary domain!
 
 <img src="/img/viewing-deployment-complete.png" alt="Demo app live on the primary domain" className="screenshot" />
 
+### Mapping Custom Subdomains
+
+For additional deployments, you can map custom subdomains to serve content at URLs like <a href="https://demo.docs.bffless.app/" target="_blank" rel="noopener noreferrer">demo.docs.bffless.app ↗</a> or `staging.docs.yourdomain.com`.
+
+<img src="/img/viewing-deployment-domains.png" alt="Create Domain Mapping dialog for subdomain configuration" className="screenshot" />
+
+1. Click **Domains** in the sidebar navigation
+2. Click **+ New Domain**
+3. Select **Subdomain (Recommended)** as the Domain Type
+4. Enter your **Subdomain** prefix (e.g., `demo`)
+5. Optionally set a **Deployment Alias** (e.g., `production`, `staging`) — defaults to `latest` if empty
+6. Optionally set a **Path** if your build outputs to a subdirectory (e.g., `/dist`)
+7. Choose the **Visibility** setting (Public, Private, or inherit from project)
+8. Enable **SPA Mode** if using React, Vue, or Angular with client-side routing
+9. Click **Create Domain**
+
+Once created, SSL certificates are automatically provisioned and DNS is verified. The domain card will show:
+- **SSL Enabled** - HTTPS is active
+- **DNS Verified** - Domain is properly configured
+- **Mapping** - Shows the alias and path (e.g., `/production/dist`)
+
+:::tip Multiple Subdomains
+You can create as many subdomains as you need — perfect for staging environments, feature previews, or serving multiple projects from the same workspace.
+:::
+
 ## Next Steps
 
 - [Traffic Splitting](/features/traffic-splitting) - A/B test between deployments

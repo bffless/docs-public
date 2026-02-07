@@ -8,7 +8,23 @@ description: A/B testing and canary deployments with traffic splitting
 
 Split traffic across multiple deployment aliases for A/B testing, canary deployments, or personalized content delivery.
 
-<img src="/img/traffic-splitting.png" alt="Traffic splitting configuration showing skills and production at 50% each, netflix and optimizely at 0% for share link routing" className="screenshot" />
+<img src="/img/traffic-splitting-settings.png" alt="Traffic splitting configuration showing production and red aliases at 50% each" className="screenshot" />
+
+## Live Demo
+
+Try traffic splitting yourself at <a href="https://demo.docs.bffless.app/" target="_blank" rel="noopener noreferrer">demo.docs.bffless.app ↗</a>. This demo splits traffic 50/50 between two versions:
+
+- **production** - Purple button (default)
+- **red** - Red button (<a href="https://github.com/bffless/demo/pull/1" target="_blank" rel="noopener noreferrer">see the PR ↗</a>)
+
+<div style={{display: 'flex', gap: '1rem', flexWrap: 'wrap', margin: '1.5rem 0'}}>
+  <img src="/img/traffic-splitting-demo-default-button.png" alt="Demo app with purple button showing production variant cookie" className="screenshot" style={{flex: '1', minWidth: '300px', maxWidth: '48%'}} />
+  <img src="/img/traffic-splitting-demo-red-button.png" alt="Demo app with red button showing red variant cookie" className="screenshot" style={{flex: '1', minWidth: '300px', maxWidth: '48%'}} />
+</div>
+
+Open in an incognito window to get randomly assigned, or use query parameters to force a specific variant:
+- <a href="https://demo.docs.bffless.app/?version=default" target="_blank" rel="noopener noreferrer">demo.docs.bffless.app/?version=default ↗</a> - Force production (purple)
+- <a href="https://demo.docs.bffless.app/?version=red" target="_blank" rel="noopener noreferrer">demo.docs.bffless.app/?version=red ↗</a> - Force red variant
 
 ## Overview
 
@@ -70,10 +86,17 @@ When enabled, a `__bffless_variant` cookie is set with the selected alias name.
 
 Override weighted distribution with deterministic routing rules. When a condition matches, the visitor is forced to that alias regardless of weights.
 
+<img src="/img/traffic-splitting-query-param.png" alt="Traffic rules configuration showing query parameter rules for version=red and version=default" className="screenshot" />
+
 | Rule Type | Example | Use Case |
 |-----------|---------|----------|
-| **Query Parameter** | `token=abc123` → `netflix` | Share links for specific audiences |
+| **Query Parameter** | `version=red` → `red` | Force specific variant for testing/validation |
 | **Cookie** | `audience=enterprise` → `enterprise` | Segment returning visitors |
+
+This is useful for:
+- **QA validation** - Test each variant before going live
+- **Support debugging** - Reproduce what a user is seeing
+- **Share links** - Direct links to specific variants for stakeholders
 
 **Rule priority:** First matching rule wins. Rules are evaluated top-to-bottom.
 
@@ -81,11 +104,11 @@ Override weighted distribution with deterministic routing rules. When a conditio
 
 ### A/B Testing
 
-Test two versions of your homepage to see which converts better:
+Test two versions of your site to see which performs better. The <a href="https://demo.docs.bffless.app/" target="_blank" rel="noopener noreferrer">live demo ↗</a> shows this in action:
 
 ```
-skills:     50%  (new design with skills section)
-production: 50%  (original design)
+production: 50%  (purple button - current design)
+red:        50%  (red button - new design variant)
 ```
 
 Track conversions using your analytics platform to determine the winner.
