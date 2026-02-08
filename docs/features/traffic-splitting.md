@@ -178,9 +178,13 @@ Set the cookie when users log in to your SaaS, and they'll automatically see the
 
 | Cookie | Value | Attributes |
 |--------|-------|------------|
-| `__bffless_variant` | Alias name (e.g., `production`) | HttpOnly, Secure, SameSite=Lax |
+| `__bffless_variant` | Alias name (e.g., `production`) | Secure, SameSite=Lax |
 
 The cookie is set on first visit and read on subsequent requests to maintain session consistency.
+
+:::tip Client-Side Access
+The cookie is intentionally **not** HttpOnly, so client-side JavaScript can read it via `document.cookie` to determine which variant is being served. This is useful for analytics tracking or conditional UI logic.
+:::
 
 ### Response Headers
 

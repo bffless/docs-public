@@ -133,6 +133,65 @@ Once created, SSL certificates are automatically provisioned and DNS is verified
 You can create as many subdomains as you need — perfect for staging environments, feature previews, or serving multiple projects from the same workspace.
 :::
 
+### Mapping Custom Domains
+
+You can also map fully custom domains (like `www.example.com` or `docs.mycompany.io`) to your deployments. This is useful when you want to serve content on a domain that isn't a subdomain of your primary domain.
+
+1. Click **Domains** in the sidebar navigation
+2. Click **+ New Domain**
+3. Select **Custom Domain** as the Domain Type
+4. Enter the full domain name (e.g., `www.staticassetshostingplatform.com`)
+5. Configure the deployment alias, path, and visibility settings
+6. Click **Create Domain**
+
+After creating the domain, you'll see DNS configuration instructions:
+
+- **A Record** - Point your domain to your server's IP address
+- **www behavior** - Optionally configure redirects between `www` and non-www versions
+
+Click **Verify DNS** once you've configured your DNS records. The verification checks that the domain resolves correctly.
+
+:::caution Custom Domain Limitations
+Custom domains are always **public** — authentication cookies don't work across different domains. If you need private content, use subdomains instead.
+:::
+
+### Custom Domains with Cloudflare
+
+If your custom domain is also managed through Cloudflare (separate from your primary domain), there are special considerations:
+
+#### DNS Verification
+
+When a custom domain uses Cloudflare's proxy (orange cloud), DNS lookups return Cloudflare's edge IPs instead of your server IP. BFFless automatically detects Cloudflare IPs and accepts them as valid during DNS verification.
+
+#### SSL Configuration
+
+Cloudflare Origin Certificates are **domain-specific** — a certificate for `j5s.dev` won't work for `staticassetshostingplatform.com`. You have two options:
+
+| Option | Cloudflare SSL Mode | Setup |
+|--------|---------------------|-------|
+| **Simple (Recommended)** | Full | Set SSL mode to "Full" in Cloudflare. This accepts any valid certificate from your origin. |
+| **Strict** | Full (Strict) | Generate a separate Origin Certificate for each custom domain in its Cloudflare zone. |
+
+To configure SSL mode for your custom domain:
+
+1. Log into Cloudflare for your custom domain's zone
+2. Go to **SSL/TLS > Overview**
+3. Set encryption mode to **Full** (not Full Strict)
+
+This allows Cloudflare to connect securely to your origin using the existing certificate, even though the hostname doesn't match.
+
+:::tip Primary Domain vs Custom Domains
+Your primary domain (configured during setup) can use **Full (Strict)** with its Origin Certificate. Each Cloudflare zone has independent SSL settings, so custom domains can use **Full** mode while your primary domain stays on **Full (Strict)**.
+:::
+
+#### Non-Cloudflare Custom Domains
+
+If your custom domain doesn't use Cloudflare:
+
+1. Point DNS directly to your server's IP address (shown in the DNS instructions)
+2. BFFless will verify the domain via HTTP health check
+3. For SSL, you can use Let's Encrypt or configure your own certificate
+
 ## Next Steps
 
 - [Traffic Splitting](/features/traffic-splitting) - A/B test between deployments

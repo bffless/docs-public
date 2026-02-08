@@ -268,6 +268,119 @@ The target URL hostname resolved but connection was refused:
 4. **Test thoroughly**: Verify proxy behavior after creating or modifying rules
 5. **Use alias overrides wisely**: Only override at alias level when environments need different backends
 
+## Use Case: Centralized Feature Flags
+
+Proxy rules enable powerful patterns like centralized feature flags that multiple projects can consume.
+
+### Architecture
+
+```mermaid
+flowchart LR
+    subgraph "Your Apps"
+        A1[App 1]
+        A2[App 2]
+        A3[App 3]
+    end
+
+    subgraph "BFFless"
+        P1[Proxy /flags/*]
+        P2[Proxy /flags/*]
+        P3[Proxy /flags/*]
+        FF[Feature Flags Project]
+    end
+
+    A1 -->|/flags/features.json| P1
+    A2 -->|/flags/features.json| P2
+    A3 -->|/flags/features.json| P3
+    P1 --> FF
+    P2 --> FF
+    P3 --> FF
+
+    style FF fill:#f9f,stroke:#333,stroke-width:2px
+```
+
+### Setup
+
+1. **Create a feature flags project** with JSON files:
+
+```
+feature-flags/
+└── flags/
+    ├── features.json       # Flag definitions
+    └── environments/
+        ├── production.json
+        └── staging.json
+```
+
+2. **Deploy to BFFless** using the GitHub Action (uploads `flags/` directory)
+
+3. **Add proxy rule to consuming apps**:
+   - **Path Pattern**: `/flags/*`
+   - **Target URL**: `https://demo-feature-flags.docs.bffless.app`
+   - **Strip Prefix**: Yes (so `/flags/features.json` → `/features.json`)
+
+### Example: Feature Flags JSON
+
+```json
+{
+  "flags": {
+    "dark_mode": {
+      "enabled": true,
+      "description": "Enable dark mode UI theme",
+      "rollout_percentage": 100
+    },
+    "new_checkout_flow": {
+      "enabled": true,
+      "description": "New streamlined checkout experience",
+      "rollout_percentage": 50
+    },
+    "beta_dashboard": {
+      "enabled": false,
+      "description": "New analytics dashboard beta",
+      "rollout_percentage": 0
+    }
+  },
+  "version": "1.0.0",
+  "last_updated": "2026-02-08T12:00:00Z"
+}
+```
+
+### Example: React Component
+
+```tsx
+import { useState, useEffect } from 'react'
+
+function App() {
+  const [flags, setFlags] = useState(null)
+
+  useEffect(() => {
+    // Fetches from your domain, proxied to feature-flags project
+    fetch('/flags/features.json')
+      .then((res) => res.json())
+      .then((data) => setFlags(data))
+  }, [])
+
+  if (!flags) return <p>Loading...</p>
+
+  return (
+    <div>
+      {flags.flags.dark_mode.enabled && <DarkModeToggle />}
+      {flags.flags.new_checkout_flow.enabled && <NewCheckout />}
+    </div>
+  )
+}
+```
+
+### Benefits
+
+- **No CORS issues** - Flags fetched from same origin via proxy
+- **Centralized management** - Update flags once, all apps get changes
+- **Version control** - Flag changes tracked in Git
+- **Environment-specific** - Use different flag files per environment
+- **No backend required** - Pure static JSON files
+
+**Live Demo:** [demo.docs.bffless.app](https://demo.docs.bffless.app) fetches flags from [demo-feature-flags.docs.bffless.app](https://demo-feature-flags.docs.bffless.app)
+
 ## Related Features
 
 - [Traffic Splitting](/features/traffic-splitting) - A/B testing and canary deployments
