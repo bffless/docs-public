@@ -47,6 +47,104 @@ flowchart TB
 2. You will land on the repository overview page at `/repo/:owner/:repo`
 3. The page displays repository statistics and three tabs: Deployments, Branches, and Aliases
 
+## Content Browser
+
+Click on any deployment to open the Content Browser - a three-panel interface for exploring, previewing, and navigating between versions of your deployed content.
+
+<img src="/img/repository-overview-red.png" alt="Content Browser showing file tree, preview iframe, and version history" className="screenshot" />
+
+### Layout Overview
+
+```mermaid
+flowchart LR
+    subgraph "Content Browser"
+        direction LR
+        A["Files<br/>(Left Panel)"]
+        B["Content Viewer<br/>(Center Panel)"]
+        C["References<br/>(Right Panel)"]
+    end
+
+    A ~~~ B ~~~ C
+```
+
+| Panel | Purpose |
+|-------|---------|
+| **Files** (Left) | Browse the file tree of your deployment |
+| **Content Viewer** (Center) | Preview, view code, or see history for selected files |
+| **References** (Right) | Switch between commits, branches, and aliases |
+
+### Files Panel (Left)
+
+The file tree displays all files in your deployment:
+
+- **Search**: Filter files by name using the search box
+- **Expandable Folders**: Click folders to expand/collapse
+- **File Info**: Shows file size next to each file
+- **File Count**: Total files shown in the header
+
+Click any file to view it in the Content Viewer.
+
+### Content Viewer (Center)
+
+The center panel has three viewing modes, accessible via tabs or keyboard shortcuts:
+
+| Tab | Shortcut | Description |
+|-----|----------|-------------|
+| **Code** | `Alt+C` | View the raw source code with syntax highlighting |
+| **Preview** | `Alt+P` | Live iframe rendering of HTML/web content |
+| **History** | `Alt+H` | View the file's change history across commits |
+
+**Preview Toolbar:**
+- **SPA Toggle**: Enable Single Page Application mode for client-side routing
+- **Copy**: Copy the file URL to clipboard
+- **Open in New Tab**: View the content in a full browser tab
+- **Refresh**: Reload the preview iframe
+
+**Status Bar** (bottom): Shows file size, MIME type, and last modified date.
+
+### References Panel (Right)
+
+The References panel provides version control navigation with three tabs:
+
+| Tab | Description |
+|-----|-------------|
+| **Aliases** | Named references like `production`, `staging` |
+| **Branches** | Git branches with deployments |
+| **Commits** | Individual deployment commits |
+
+Each commit row shows:
+- **Status Indicator**: Green circle = currently viewing, hollow = available
+- **Commit SHA**: Short hash (e.g., `3d1a97a`)
+- **Branch Badge**: Which branch the commit is from (e.g., `main`)
+- **Alias Badge**: Any aliases pointing to this commit (e.g., `production`)
+- **Timestamp**: Relative time (e.g., "about 3 hours ago")
+- **Checkmark**: Indicates the currently selected version
+
+### Switching Between Versions
+
+Click any commit, branch, or alias in the References panel to instantly switch the Content Browser to that version:
+
+<img src="/img/repository-overview-purple.png" alt="Content Browser showing a different commit selected" className="screenshot" />
+
+The URL updates to reflect the selected version, making it easy to share links to specific deployments.
+
+### Use Cases
+
+**Compare Versions**: Quickly switch between commits to compare how content changed:
+1. Select a commit in the References panel
+2. Preview the content
+3. Click a different commit to see the previous version
+
+**Debug Production Issues**: View exactly what's deployed:
+1. Click the `production` alias in References
+2. Browse the file tree to find the relevant file
+3. Use Code view to inspect the deployed source
+
+**Review Before Promoting**: Preview a staging deployment before promoting to production:
+1. Navigate to the staging commit
+2. Use Preview mode to test the application
+3. If satisfied, update the production alias
+
 ## Deployments Tab
 
 The **Deployments Tab** shows all deployments for the repository:

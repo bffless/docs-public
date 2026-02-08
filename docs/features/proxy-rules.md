@@ -21,7 +21,7 @@ flowchart LR
     C -->|Response| B
     B -->|Response| A
 
-    style B fill:#f9f,stroke:#333,stroke-width:2px
+    style B fill:#e0f2fe,stroke:#333,stroke-width:2px
 ```
 
 **Live Example:** `https://orbs.sandbox.workspace.bffless.app/api/users` proxies to `https://jsonplaceholder.typicode.com/users`
@@ -296,7 +296,7 @@ flowchart LR
     P2 --> FF
     P3 --> FF
 
-    style FF fill:#f9f,stroke:#333,stroke-width:2px
+    style FF fill:#e0f2fe,stroke:#333,stroke-width:2px
 ```
 
 ### Setup
@@ -413,7 +413,7 @@ flowchart TB
     PR -->|"Response"| A
     A -->|"Response"| Browser
 
-    style PR fill:#f9f,stroke:#333,stroke-width:2px
+    style PR fill:#e0f2fe,stroke:#333,stroke-width:2px
     style FF fill:#bbf,stroke:#333,stroke-width:2px
 ```
 
