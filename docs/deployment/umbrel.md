@@ -188,5 +188,4 @@ Unlike the standard CE deployment, Umbrel requires a manual app restart after ad
 Once BFFless is running:
 
 - [Upload your first site](/getting-started/quickstart)
-- [Configure custom domains](/features/custom-domains)
 - [Set up GitHub Actions](/deployment/github-actions) for CI/CD deployments
