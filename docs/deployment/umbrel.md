@@ -63,7 +63,7 @@ Once connected, you'll see your tunnel with a **HEALTHY** status:
 
 ### Step 4: Add Routes for BFFless
 
-1. In the Cloudflare dashboard, go to **Networks** → **Connectors**
+1. In the Cloudflare Zero Trust dashboard, go to **Networks** → **Connectors**
 2. Click on your tunnel name (e.g., "Umbrel")
 3. Go to the **Published application routes** tab
 4. Click **Add a published application route** and create the following 3 routes:
@@ -80,11 +80,11 @@ Once connected, you'll see your tunnel with a **HEALTHY** status:
 Using `*` as the subdomain allows BFFless to host sites on any subdomain (e.g., `mysite.yourdomain.com`, `blog.yourdomain.com`). This is recommended for maximum flexibility.
 :::
 
-### Step 5: Configure DNS (for Wildcard Routes)
+### Step 5: Configure Wildcard DNS
 
-If you configured a wildcard route (`*.yourdomain.com`), you need to manually add a DNS record:
+Cloudflare doesn't automatically create DNS records for wildcard routes, so you need to add one manually:
 
-1. Go to your domain's DNS settings in Cloudflare
+1. Go to your domain's DNS settings in Cloudflare (not Zero Trust)
 2. Click **Add record**
 3. Configure:
 
@@ -95,11 +95,11 @@ If you configured a wildcard route (`*.yourdomain.com`), you need to manually ad
 | **Target**       | `<tunnel-id>.cfargotunnel.com` |
 | **Proxy status** | Proxied (orange cloud)         |
 
-You can find your tunnel ID in the Cloudflare Tunnels dashboard.
-
-:::note
-For non-wildcard routes (like `admin.yourdomain.com`), Cloudflare automatically creates the DNS record when you add the route.
+:::tip
+The `admin` and `www` routes from Step 4 automatically created CNAME records. You can copy the target value (e.g., `abc123.cfargotunnel.com`) from one of those DNS records.
 :::
+
+<img src="/img/umbrel-cloudflare-dns.png" alt="Cloudflare DNS settings showing wildcard CNAME record pointing to tunnel" className="screenshot" />
 
 ## Configure BFFless Domain
 
