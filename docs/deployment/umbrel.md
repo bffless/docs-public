@@ -151,13 +151,7 @@ Restart the app to apply the domain configuration:
 
 ## Access Your App
 
-Visit your configured domain (e.g., `https://yourdomain.com`) to access BFFless and complete the setup wizard.
-
-You should see the BFFless setup wizard where you can:
-
-- Create your admin account
-- Configure storage settings
-- Set up email notifications (optional)
+Visit your admin subdomain (e.g., `https://admin.yourdomain.com`) to access BFFless and complete the [setup wizard](/getting-started/setup-wizard).
 
 ## Troubleshooting
 

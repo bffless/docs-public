@@ -43,12 +43,18 @@ Use this option when BFFless is deployed outside AWS (e.g., DigitalOcean, self-h
 3. Enter a username (e.g., `bffless-storage-user`)
 4. Click **Next**
 5. Select **Attach policies directly**
-6. Click **Create policy** and use the JSON below
-7. Attach the policy to the user
-8. Click **Next** → **Create user**
-9. Go to the user → **Security credentials** → **Create access key**
-10. Select **Application running outside AWS**
-11. **Save the Access Key ID and Secret Access Key** (shown only once)
+6. Click **Create policy** (opens in a new tab)
+7. In the policy editor, click the **JSON** tab (top right of the Policy editor)
+8. Delete the default content and paste the [IAM Policy JSON below](#iam-policy)
+9. Click **Next**
+10. Enter a policy name (e.g., `bffless-s3-access`)
+11. Click **Create policy**
+12. Return to the user creation tab and click the **refresh icon** (⟳) next to "Create policy"
+13. Search for your policy name (e.g., `bffless-s3-access`) and check the box to select it
+14. Click **Next** → **Create user**
+15. Click on the new user → **Security credentials** tab → **Create access key**
+16. Select **Application running outside AWS** → **Next**
+17. **Save the Access Key ID and Secret Access Key** (the secret is shown only once)
 
 ### Option B: IAM Role (Recommended for AWS deployments)
 
@@ -80,7 +86,8 @@ Minimum required permissions for BFFless:
         "s3:GetObject",
         "s3:DeleteObject",
         "s3:ListBucket",
-        "s3:GetObjectAttributes"
+        "s3:GetObjectAttributes",
+        "s3:GetBucketLocation"
       ],
       "Resource": [
         "arn:aws:s3:::YOUR-BUCKET-NAME",
