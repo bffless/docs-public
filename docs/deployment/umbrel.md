@@ -82,7 +82,7 @@ Once connected, you'll see your tunnel with a **HEALTHY** status:
 
 <img src="/img/umbrel-cloudflare-connectors.png" alt="Cloudflare Tunnels Dashboard showing Umbrel connector with HEALTHY status" className="screenshot" />
 
-### Step 4: Add Routes for BFFless
+### Step 4: Add Routes to the BFFless App
 
 1. In the Cloudflare Zero Trust dashboard, go to **Networks** → **Connectors**
 2. Click on your tunnel name (e.g., "Umbrel")
@@ -122,7 +122,7 @@ The `admin` and `www` routes from Step 4 automatically created CNAME records. Yo
 
 <img src="/img/umbrel-cloudflare-dns.png" alt="Cloudflare DNS settings showing wildcard CNAME record pointing to tunnel" className="screenshot" />
 
-## Configure BFFless Domain
+## Configure Your Domain
 
 ### Step 6: Set Your Domain
 
@@ -140,14 +140,16 @@ echo "yourdomain.com" > ~/umbrel/app-data/bffless/data/config/domain.txt
 
 Replace `yourdomain.com` with your actual domain.
 
-### Step 7: Restart BFFless
+### Step 7: Restart BFFless App
 
 Restart the app to apply the domain configuration:
 
 1. Go to your Umbrel dashboard
 2. Find the BFFless app
-3. Click the three dots menu (⋮)
+3. Right-click (or ctrl+click) on the app icon
 4. Select **Restart**
+
+<img src="/img/umbrel-restart.png" alt="Umbrel app context menu showing Restart option" className="screenshot" />
 
 ## Access Your App
 
