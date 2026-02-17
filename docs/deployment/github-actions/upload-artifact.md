@@ -1,21 +1,12 @@
 ---
-sidebar_position: 5
-title: GitHub Actions CI/CD
-description: Automate deployments using the BFFless GitHub Action
+sidebar_position: 2
+title: Upload Artifact
+description: Upload build artifacts to BFFless using GitHub Actions
 ---
 
-# GitHub Actions CI/CD
+# Upload Artifact Action
 
-Automate static asset deployments using the official BFFless GitHub Action.
-
-## Overview
-
-The `bffless/upload-artifact` action zips and uploads your build artifacts to BFFless. It handles:
-
-- Zipping your build directory
-- Uploading via the BFFless API
-- Auto-detecting commit SHA and branch from GitHub context
-- Writing deployment summaries to your workflow
+The `bffless/upload-artifact` action uploads your build artifacts to BFFless.
 
 ## Quick Start
 
@@ -29,27 +20,7 @@ The `bffless/upload-artifact` action zips and uploads your build artifacts to BF
 
 Only 3 required inputs. Everything else is auto-detected from GitHub context.
 
-## Setup
-
-### 1. Get Your API Key
-
-1. Go to your BFFless admin panel (`https://admin.yourdomain.com`)
-2. Navigate to Settings → API Keys
-3. Create a new API key
-4. Copy the key (it won't be shown again)
-
-### 2. Configure GitHub Secrets
-
-Go to your repository → Settings → Secrets and variables → Actions:
-
-| Type | Name | Value |
-|------|------|-------|
-| Variable | `BFFLESS_URL` | `https://admin.yourdomain.com` |
-| Secret | `BFFLESS_API_KEY` | Your API key |
-
-### 3. Create Workflow
-
-Create `.github/workflows/deploy.yml`:
+## Full Workflow Example
 
 ```yaml
 name: Deploy to BFFless
@@ -82,6 +53,58 @@ jobs:
           path: dist
           api-url: ${{ vars.BFFLESS_URL }}
           api-key: ${{ secrets.BFFLESS_API_KEY }}
+```
+
+## Inputs
+
+| Input | Required | Default | Description |
+|-------|----------|---------|-------------|
+| `path` | **Yes** | - | Build directory to upload |
+| `api-url` | **Yes** | - | BFFless platform URL |
+| `api-key` | **Yes** | - | API key for authentication |
+| `repository` | No | Current repo | Repository in `owner/repo` format |
+| `commit-sha` | No | Auto-detected | Git commit SHA |
+| `branch` | No | Auto-detected | Branch name |
+| `is-public` | No | `true` | Public visibility |
+| `alias` | No | - | Deployment alias (e.g., `production`) |
+| `base-path` | No | `/<path>` | Path prefix in zip |
+| `committed-at` | No | Auto-detected | ISO 8601 commit timestamp |
+| `description` | No | - | Human-readable description |
+| `proxy-rule-set-name` | No | - | Proxy rule set name |
+| `proxy-rule-set-id` | No | - | Proxy rule set ID |
+| `tags` | No | - | Comma-separated tags |
+| `summary` | No | `true` | Write GitHub Step Summary |
+| `summary-title` | No | `Deployment Summary` | Summary heading |
+| `working-directory` | No | `.` | Working directory |
+
+## Outputs
+
+| Output | Description |
+|--------|-------------|
+| `deployment-url` | Primary URL (SHA-based) |
+| `sha-url` | Immutable SHA-based URL |
+| `alias-url` | Alias-based URL |
+| `branch-url` | Branch-based URL |
+| `preview-url` | Preview URL (if basePath provided) |
+| `deployment-id` | API deployment ID |
+| `file-count` | Number of files uploaded |
+| `total-size` | Total bytes uploaded |
+| `response` | Raw JSON response |
+
+### Using Outputs
+
+```yaml
+- uses: bffless/upload-artifact@v1
+  id: deploy
+  with:
+    path: dist
+    api-url: ${{ vars.BFFLESS_URL }}
+    api-key: ${{ secrets.BFFLESS_API_KEY }}
+
+- run: |
+    echo "SHA URL: ${{ steps.deploy.outputs.sha-url }}"
+    echo "Files: ${{ steps.deploy.outputs.file-count }}"
+    echo "Size: ${{ steps.deploy.outputs.total-size }} bytes"
 ```
 
 ## Examples
@@ -213,58 +236,6 @@ Apply proxy rules for API routing:
     proxy-rule-set-name: api-proxy
 ```
 
-## Inputs
-
-| Input | Required | Default | Description |
-|-------|----------|---------|-------------|
-| `path` | **Yes** | - | Build directory to upload |
-| `api-url` | **Yes** | - | BFFless platform URL |
-| `api-key` | **Yes** | - | API key for authentication |
-| `repository` | No | Current repo | Repository in `owner/repo` format |
-| `commit-sha` | No | Auto-detected | Git commit SHA |
-| `branch` | No | Auto-detected | Branch name |
-| `is-public` | No | `true` | Public visibility |
-| `alias` | No | - | Deployment alias (e.g., `production`) |
-| `base-path` | No | `/<path>` | Path prefix in zip |
-| `committed-at` | No | Auto-detected | ISO 8601 commit timestamp |
-| `description` | No | - | Human-readable description |
-| `proxy-rule-set-name` | No | - | Proxy rule set name |
-| `proxy-rule-set-id` | No | - | Proxy rule set ID |
-| `tags` | No | - | Comma-separated tags |
-| `summary` | No | `true` | Write GitHub Step Summary |
-| `summary-title` | No | `Deployment Summary` | Summary heading |
-| `working-directory` | No | `.` | Working directory |
-
-## Outputs
-
-| Output | Description |
-|--------|-------------|
-| `deployment-url` | Primary URL (SHA-based) |
-| `sha-url` | Immutable SHA-based URL |
-| `alias-url` | Alias-based URL |
-| `branch-url` | Branch-based URL |
-| `preview-url` | Preview URL (if basePath provided) |
-| `deployment-id` | API deployment ID |
-| `file-count` | Number of files uploaded |
-| `total-size` | Total bytes uploaded |
-| `response` | Raw JSON response |
-
-### Using Outputs
-
-```yaml
-- uses: bffless/upload-artifact@v1
-  id: deploy
-  with:
-    path: dist
-    api-url: ${{ vars.BFFLESS_URL }}
-    api-key: ${{ secrets.BFFLESS_API_KEY }}
-
-- run: |
-    echo "SHA URL: ${{ steps.deploy.outputs.sha-url }}"
-    echo "Files: ${{ steps.deploy.outputs.file-count }}"
-    echo "Size: ${{ steps.deploy.outputs.total-size }} bytes"
-```
-
 ## How It Works
 
 1. **Validates** the build directory exists and is non-empty
@@ -313,9 +284,3 @@ Ensure you're using `fetch-depth: 0` in checkout:
 - Verify your build command completed successfully
 - Check the `path` input matches your build output directory
 - Use `working-directory` if building in a subdirectory
-
-## Related Documentation
-
-- [Traffic Splitting](/features/traffic-splitting) - Route traffic between deployments
-- [Proxy Rules](/features/proxy-rules) - Configure API proxying
-- [API Reference](/reference/api) - Direct API usage

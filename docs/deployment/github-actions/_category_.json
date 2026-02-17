@@ -1,0 +1,8 @@
+{
+  "label": "GitHub Actions",
+  "position": 5,
+  "link": {
+    "type": "doc",
+    "id": "deployment/github-actions/index"
+  }
+}

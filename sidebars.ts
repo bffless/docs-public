@@ -47,7 +47,18 @@ const sidebars: SidebarsConfig = {
         'deployment/overview',
         'deployment/digitalocean',
         'deployment/ssl-certificates',
-        'deployment/github-actions',
+        {
+          type: 'category',
+          label: 'GitHub Actions',
+          link: {
+            type: 'doc',
+            id: 'deployment/github-actions/index',
+          },
+          items: [
+            'deployment/github-actions/upload-artifact',
+            'deployment/github-actions/download-artifact',
+          ],
+        },
         'deployment/umbrel',
       ],
     },
