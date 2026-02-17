@@ -94,6 +94,17 @@ const sidebars: SidebarsConfig = {
     },
     {
       type: 'category',
+      label: 'Recipes',
+      link: {
+        type: 'doc',
+        id: 'recipes/index',
+      },
+      items: [
+        'recipes/coverage-comparison',
+      ],
+    },
+    {
+      type: 'category',
       label: 'Reference',
       link: {
         type: 'generated-index',

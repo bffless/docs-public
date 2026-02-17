@@ -10,9 +10,9 @@ The `bffless/download-artifact` action downloads previously deployed artifacts f
 
 ## Use Cases
 
+- Comparing coverage between PRs and production
 - Deploying the same build to multiple environments
 - Running tests against a deployed build
-- Promoting a staging deployment to production
 - Sharing builds across repositories
 
 ## Quick Start
@@ -56,35 +56,29 @@ You must specify one of `alias`, `commit-sha`, or `branch` to identify which dep
 
 ## Examples
 
-### Promote Staging to Production
+### Compare Coverage Between PR and Production
 
-Download from staging alias and re-upload as production:
+Download the production coverage baseline to compare against PR coverage:
 
 ```yaml
-name: Promote to Production
+- name: Download production coverage
+  uses: bffless/download-artifact@v1
+  continue-on-error: true  # Don't fail if no baseline exists yet
+  with:
+    alias: coverage-production
+    source-path: coverage
+    output-path: ./coverage-production
+    api-url: ${{ vars.BFFLESS_URL }}
+    api-key: ${{ secrets.BFFLESS_API_KEY }}
 
-on:
-  workflow_dispatch:
-
-jobs:
-  promote:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: bffless/download-artifact@v1
-        with:
-          source-path: dist
-          api-url: ${{ vars.BFFLESS_URL }}
-          api-key: ${{ secrets.BFFLESS_API_KEY }}
-          alias: staging
-
-      - uses: bffless/upload-artifact@v1
-        with:
-          path: dist
-          api-url: ${{ vars.BFFLESS_URL }}
-          api-key: ${{ secrets.BFFLESS_API_KEY }}
-          alias: production
-          description: 'Promoted from staging'
+- name: Compare coverage
+  run: |
+    PR_COV=$(jq '.total.lines.pct' ./coverage/coverage-summary.json)
+    PROD_COV=$(jq '.total.lines.pct' ./coverage-production/coverage-summary.json)
+    echo "PR: $PR_COV% | Production: $PROD_COV%"
 ```
+
+For a complete implementation with PR comments, see the [Coverage Comparison recipe](/recipes/coverage-comparison).
 
 ### Download Specific Commit
 
