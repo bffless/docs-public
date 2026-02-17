@@ -6,7 +6,7 @@ description: Compare test coverage between PRs and production using BFFless arti
 
 # Coverage Comparison
 
-This recipe demonstrates how to compare test coverage between your pull requests and production, posting the difference as a PR comment. It uses the `bffless/upload-artifact` and `bffless/download-artifact` GitHub Actions to store and retrieve coverage reports.
+This recipe demonstrates how to compare test coverage between your pull requests and production, posting the difference as a PR comment. It uses the [`bffless/upload-artifact`](https://github.com/bffless/upload-artifact) and [`bffless/download-artifact`](https://github.com/bffless/download-artifact) GitHub Actions to store and retrieve coverage reports.
 
 ```mermaid
 flowchart TB
