@@ -243,7 +243,9 @@ The `compare-screenshots` action handles everything:
 
 When the workflow runs, it posts a comment like this:
 
-[![Visual Regression Report](/img/github-actions-compare-screenshot.png)](https://github.com/bffless/demo/pull/1#issuecomment-3914080635)
+<a href="https://github.com/bffless/demo/pull/1#issuecomment-3914080635">
+  <img src="/img/github-actions-compare-screenshot.png" alt="Visual Regression Report showing failed screenshots with Production, PR, and Diff comparison" className="screenshot" />
+</a>
 
 The comment includes:
 - **Summary status** - Quick indicator showing passed/failed screenshots

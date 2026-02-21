@@ -103,6 +103,7 @@ const sidebars: SidebarsConfig = {
       },
       items: [
         'recipes/coverage-comparison',
+        'recipes/compare-screenshots',
       ],
     },
     {
