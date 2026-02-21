@@ -6,7 +6,7 @@ description: Compare test coverage between PRs and production using BFFless arti
 
 # Coverage Comparison
 
-This recipe demonstrates how to compare test coverage between your pull requests and production, posting the difference as a PR comment. It uses the [`bffless/upload-artifact`](https://github.com/bffless/upload-artifact) and [`bffless/download-artifact`](https://github.com/bffless/download-artifact) GitHub Actions to store and retrieve coverage reports.
+This recipe demonstrates how to compare test coverage between your pull requests and production, posting the difference as a PR comment. It uses the [`bffless/upload-artifact`](https://github.com/bffless/upload-artifact) action to store baseline coverage and the [`bffless/compare-coverage`](https://github.com/bffless/compare-coverage) action to compare and report results.
 
 ```mermaid
 flowchart TB
@@ -18,15 +18,13 @@ flowchart TB
 
     subgraph pr["Pull Request"]
         P1[Run Tests] --> P2[Generate PR Coverage]
-        P2 --> P3[Download Production Coverage]
-        P3 --> P4[Compare Coverage]
-        P4 --> P5[Post PR Comment]
+        P2 --> P3[Compare & Comment]
     end
 
-    M4 -.->|"download-artifact"| P3
+    M4 -.->|"compare-coverage"| P3
 
     style M4 fill:#4ade80,stroke:#16a34a
-    style P5 fill:#60a5fa,stroke:#2563eb
+    style P3 fill:#60a5fa,stroke:#2563eb
 ```
 
 ## Overview
@@ -34,19 +32,33 @@ flowchart TB
 The pattern works as follows:
 
 1. **Main branch workflow**: After tests pass, upload the coverage report to BFFless with a stable alias (e.g., `coverage-production`)
-2. **PR workflow**: Run tests, download the production coverage, compare percentages, and post a comment showing the diff
+2. **PR workflow**: Run tests, then use `compare-coverage` to automatically fetch the baseline, compare metrics, and post a PR comment
 
 This gives reviewers immediate visibility into coverage impact without leaving the PR.
 
 ## Prerequisites
 
-- A project with tests that generate coverage reports (this recipe uses Vitest, but any tool that outputs `coverage-summary.json` works)
+- A project with tests that generate coverage reports
 - BFFless instance with API access configured
 - GitHub repository with Actions enabled
 
+### Supported Coverage Formats
+
+The `compare-coverage` action supports multiple coverage formats:
+
+| Format | File Types | Used By |
+|--------|------------|---------|
+| **lcov** | `.info`, `.lcov` | Jest, c8, nyc, gcov, Vitest |
+| **istanbul** | `coverage-final.json` | Jest, nyc, Istanbul |
+| **cobertura** | `.xml` | Python (coverage.py), .NET, PHPUnit |
+| **clover** | `.xml` | PHP (PHPUnit), Java |
+| **jacoco** | `.xml` | Java, Kotlin, Scala |
+
+The format is auto-detected, so you can use this recipe with any of these coverage tools.
+
 ## Step 1: Configure Test Coverage
 
-First, set up your test runner to output coverage in JSON format. Here's an example using Vitest:
+First, set up your test runner to output a coverage report. Here's an example using Vitest with LCOV format:
 
 ### Install Dependencies
 
@@ -67,7 +79,7 @@ export default defineConfig({
     globals: true,
     coverage: {
       provider: 'v8',
-      reporter: ['text', 'json', 'json-summary', 'html'],
+      reporter: ['text', 'lcov', 'html'],
       reportsDirectory: './coverage',
     },
   },
@@ -85,7 +97,7 @@ export default defineConfig({
 }
 ```
 
-The key output file is `coverage/coverage-summary.json`, which contains overall coverage percentages.
+The key output file is `coverage/lcov.info`, which contains detailed coverage data. You can also use `json-summary` format if preferred—the action auto-detects the format.
 
 ## Step 2: Main Branch Workflow
 
@@ -125,9 +137,9 @@ jobs:
       - name: Upload coverage baseline
         uses: bffless/upload-artifact@v1
         with:
-          path: coverage
-          api-url: ${{ vars.ASSET_HOST_URL }}
-          api-key: ${{ secrets.ASSET_HOST_KEY }}
+          path: coverage/lcov.info
+          api-url: ${{ vars.BFFLESS_URL }}
+          api-key: ${{ secrets.BFFLESS_API_KEY }}
           alias: coverage-production
           description: 'Coverage baseline for main@${{ github.sha }}'
       # highlight-end
@@ -141,7 +153,7 @@ The `alias: coverage-production` ensures each push to main overwrites the previo
 
 ## Step 3: PR Workflow with Comparison
 
-Update your PR workflow to download the baseline, compare, and comment:
+Update your PR workflow to compare coverage and post a comment:
 
 ```yaml title=".github/workflows/pr-preview.yml"
 name: PR Preview
@@ -175,95 +187,15 @@ jobs:
         run: pnpm test:coverage
 
       # highlight-start
-      - name: Download production coverage
-        id: download-coverage
-        uses: bffless/download-artifact@v1
-        continue-on-error: true  # Don't fail if no baseline exists yet
+      - name: Compare coverage
+        uses: bffless/compare-coverage@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          alias: coverage-production
-          source-path: coverage
-          output-path: ./coverage-production
-          api-url: ${{ vars.ASSET_HOST_URL }}
-          api-key: ${{ secrets.ASSET_HOST_KEY }}
-
-      - name: Compare coverage and comment on PR
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const fs = require('fs');
-
-            // Read PR coverage
-            let prCoverage = null;
-            try {
-              const prSummary = JSON.parse(
-                fs.readFileSync('./coverage/coverage-summary.json', 'utf8')
-              );
-              prCoverage = prSummary.total.lines.pct;
-            } catch (e) {
-              console.log('Could not read PR coverage:', e.message);
-            }
-
-            // Read production coverage
-            let prodCoverage = null;
-            try {
-              const prodSummary = JSON.parse(
-                fs.readFileSync('./coverage-production/coverage-summary.json', 'utf8')
-              );
-              prodCoverage = prodSummary.total.lines.pct;
-            } catch (e) {
-              console.log('Could not read production coverage:', e.message);
-            }
-
-            // Build comment
-            let body = '## Coverage Report\n\n';
-
-            if (prCoverage !== null) {
-              body += `**PR Coverage:** ${prCoverage.toFixed(2)}%\n\n`;
-
-              if (prodCoverage !== null) {
-                const diff = prCoverage - prodCoverage;
-                const emoji = diff >= 0 ? '📈' : '📉';
-                const sign = diff >= 0 ? '+' : '';
-                body += `**Production Coverage:** ${prodCoverage.toFixed(2)}%\n\n`;
-                body += `**Change:** ${emoji} ${sign}${diff.toFixed(2)}%\n`;
-              } else {
-                body += '_No production coverage baseline found._\n';
-                body += '_This PR will establish the baseline once merged._\n';
-              }
-            } else {
-              body += '_Could not read coverage report._\n';
-            }
-
-            body += '\n---\n';
-            body += '_Generated by [BFFless](https://bffless.app) coverage comparison_';
-
-            // Find existing comment to update
-            const { data: comments } = await github.rest.issues.listComments({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: context.issue.number,
-            });
-
-            const botComment = comments.find(comment =>
-              comment.user.type === 'Bot' &&
-              comment.body.includes('## Coverage Report')
-            );
-
-            if (botComment) {
-              await github.rest.issues.updateComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                comment_id: botComment.id,
-                body: body,
-              });
-            } else {
-              await github.rest.issues.createComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: context.issue.number,
-                body: body,
-              });
-            }
+          path: ./coverage/lcov.info
+          baseline-alias: coverage-production
+          api-url: ${{ vars.BFFLESS_URL }}
+          api-key: ${{ secrets.BFFLESS_API_KEY }}
       # highlight-end
 
       - name: Build preview
@@ -271,84 +203,154 @@ jobs:
         # ... rest of your preview deployment steps
 ```
 
+The `compare-coverage` action handles everything:
+- Downloads the baseline coverage from BFFless
+- Parses both coverage reports
+- Compares metrics (lines, branches, functions, statements)
+- Posts a PR comment with the comparison table
+- Generates a GitHub step summary
+- Fails if coverage regresses (configurable)
+
 ## Example PR Comment
 
 When the workflow runs, it posts a comment like this:
 
 [![Coverage Report Comment](/img/github-actions-coverage-comment.png)](https://github.com/bffless/demo/pull/1#issuecomment-3914080635)
 
-The comment shows:
-- **PR Coverage** - Coverage from the current pull request
-- **Production Coverage** - Baseline coverage from the main branch
-- **Change** - The difference with an indicator (📈 for increase, 📉 for decrease)
+The comment includes:
+- **Summary callout** - Quick indicator if coverage improved, regressed, or stayed the same
+- **Metrics table** - Side-by-side comparison of all coverage metrics (statements, branches, functions, lines)
+- **Baseline info** - Shows which commit the baseline came from
 
 On subsequent pushes to the same PR, the comment is updated rather than creating new comments.
 
-## Extending the Recipe
+## Configuration Options
 
-### Add Coverage Thresholds
+### Allow Minor Regression
 
-Fail the workflow if coverage drops below a threshold:
+By default, the action fails on any coverage regression. Use `threshold` to allow small decreases:
 
 ```yaml
-- name: Check coverage threshold
+- name: Compare coverage
+  uses: bffless/compare-coverage@v1
+  env:
+    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  with:
+    path: ./coverage/lcov.info
+    baseline-alias: coverage-production
+    api-url: ${{ vars.BFFLESS_URL }}
+    api-key: ${{ secrets.BFFLESS_API_KEY }}
+    threshold: 1  # Allow up to 1% regression
+```
+
+### Disable Failure on Regression
+
+To report coverage changes without failing the workflow:
+
+```yaml
+- name: Compare coverage
+  uses: bffless/compare-coverage@v1
+  env:
+    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  with:
+    path: ./coverage/lcov.info
+    baseline-alias: coverage-production
+    api-url: ${{ vars.BFFLESS_URL }}
+    api-key: ${{ secrets.BFFLESS_API_KEY }}
+    fail-on-regression: false
+```
+
+### Use Coverage Outputs
+
+Access coverage values in subsequent steps:
+
+```yaml
+- name: Compare coverage
+  id: coverage
+  uses: bffless/compare-coverage@v1
+  env:
+    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  with:
+    path: ./coverage/lcov.info
+    baseline-alias: coverage-production
+    api-url: ${{ vars.BFFLESS_URL }}
+    api-key: ${{ secrets.BFFLESS_API_KEY }}
+    fail-on-regression: false
+
+- name: Check coverage result
   run: |
-    COVERAGE=$(jq '.total.lines.pct' ./coverage/coverage-summary.json)
-    if (( $(echo "$COVERAGE < 80" | bc -l) )); then
-      echo "Coverage $COVERAGE% is below 80% threshold"
-      exit 1
+    echo "Lines: ${{ steps.coverage.outputs.lines }}%"
+    echo "Delta: ${{ steps.coverage.outputs.lines-delta }}%"
+    echo "Result: ${{ steps.coverage.outputs.result }}"
+
+    if [ "${{ steps.coverage.outputs.result }}" == "fail" ]; then
+      echo "::warning::Coverage regressed beyond threshold"
     fi
 ```
 
-### Compare More Metrics
+Available outputs: `statements`, `branches`, `functions`, `lines`, and their `-delta` variants. The `result` output is `pass`, `fail`, or `improved`.
 
-The `coverage-summary.json` includes multiple metrics. Extend the comparison:
+### Custom Comment Header
 
-```javascript
-const metrics = ['lines', 'statements', 'functions', 'branches'];
-let table = '| Metric | PR | Prod | Change |\n|--------|-----|------|--------|\n';
-
-for (const metric of metrics) {
-  const pr = prSummary.total[metric].pct;
-  const prod = prodSummary.total[metric].pct;
-  const diff = pr - prod;
-  const sign = diff >= 0 ? '+' : '';
-  table += `| ${metric} | ${pr.toFixed(1)}% | ${prod.toFixed(1)}% | ${sign}${diff.toFixed(1)}% |\n`;
-}
-```
-
-### Block PRs with Coverage Regression
-
-Add a status check that fails if coverage decreases:
+Customize the PR comment identifier (useful if you have multiple coverage reports):
 
 ```yaml
-- name: Check for coverage regression
-  if: steps.download-coverage.outcome == 'success'
-  run: |
-    PR_COV=$(jq '.total.lines.pct' ./coverage/coverage-summary.json)
-    PROD_COV=$(jq '.total.lines.pct' ./coverage-production/coverage-summary.json)
-    if (( $(echo "$PR_COV < $PROD_COV" | bc -l) )); then
-      echo "::error::Coverage decreased from $PROD_COV% to $PR_COV%"
-      exit 1
-    fi
+- name: Compare frontend coverage
+  uses: bffless/compare-coverage@v1
+  env:
+    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  with:
+    path: ./coverage/lcov.info
+    baseline-alias: coverage-frontend-production
+    api-url: ${{ vars.BFFLESS_URL }}
+    api-key: ${{ secrets.BFFLESS_API_KEY }}
+    comment-header: '## Frontend Coverage'
+
+- name: Compare backend coverage
+  uses: bffless/compare-coverage@v1
+  env:
+    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  with:
+    path: ./backend-coverage/lcov.info
+    baseline-alias: coverage-backend-production
+    api-url: ${{ vars.BFFLESS_URL }}
+    api-key: ${{ secrets.BFFLESS_API_KEY }}
+    comment-header: '## Backend Coverage'
 ```
 
 ## Troubleshooting
 
-### "No production coverage baseline found"
+### "No baseline found" warning
 
-This is expected on the first PR before any code has been merged to main. Once you merge a PR, the main branch workflow will upload the baseline.
+This is expected on the first PR before any code has been merged to main. Once you merge a PR, the main branch workflow will upload the baseline. The action will still report current coverage.
 
-### Download fails with 404
+### Baseline download fails
 
 Check that:
-1. The `alias` matches exactly between upload and download (`coverage-production`)
+1. The `baseline-alias` matches exactly what you used in `upload-artifact` (`coverage-production`)
 2. The main branch workflow has run successfully at least once
 3. The API URL and key are configured correctly in repository variables/secrets
 
 ### Coverage numbers don't match local
 
 Ensure you're running the same test command locally (`pnpm test:coverage`) and that your CI environment matches your local Node.js version.
+
+### Wrong coverage format detected
+
+If auto-detection picks the wrong format, explicitly set it:
+
+```yaml
+- name: Compare coverage
+  uses: bffless/compare-coverage@v1
+  env:
+    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  with:
+    path: ./coverage/lcov.info
+    baseline-alias: coverage-production
+    api-url: ${{ vars.BFFLESS_URL }}
+    api-key: ${{ secrets.BFFLESS_API_KEY }}
+    format: lcov  # Explicitly set format
+```
 
 ## See It in Action
 

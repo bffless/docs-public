@@ -19,6 +19,15 @@ Compare test coverage between your PR and production. This recipe shows how to:
 
 Perfect for teams that want to track coverage trends and catch regressions before merging.
 
+### [Visual Regression Testing](./compare-screenshots)
+
+Compare screenshots between your PR and production for visual regression testing. This recipe shows how to:
+- Capture and upload screenshots from your main branch as a baseline
+- Compare screenshots pixel-by-pixel in PR workflows
+- Post visual diff reports with side-by-side comparisons on pull requests
+
+Perfect for teams that want to catch unintended visual changes before merging.
+
 ---
 
 ## Contributing Recipes
