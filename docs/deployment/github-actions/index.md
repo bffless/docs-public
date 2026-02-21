@@ -10,11 +10,12 @@ Automate static asset deployments using the official BFFless GitHub Actions.
 
 ## Available Actions
 
-| Action | Description |
-|--------|-------------|
-| [`bffless/upload-artifact`](/deployment/github-actions/upload-artifact) | Upload build artifacts to BFFless |
-| [`bffless/download-artifact`](/deployment/github-actions/download-artifact) | Download deployed artifacts from BFFless |
+| Action                                                                          | Description                                         |
+| ------------------------------------------------------------------------------- | --------------------------------------------------- |
+| [`bffless/upload-artifact`](/deployment/github-actions/upload-artifact)         | Upload build artifacts to BFFless                   |
+| [`bffless/download-artifact`](/deployment/github-actions/download-artifact)     | Download deployed artifacts from BFFless            |
 | [`bffless/compare-screenshots`](/deployment/github-actions/compare-screenshots) | Visual regression testing against BFFless baselines |
+| [`bffless/compare-coverage`](/deployment/github-actions/compare-coverage)       | Code coverage regression detection                  |
 
 ## Setup
 
@@ -31,10 +32,10 @@ Both actions require the same authentication setup.
 
 Go to your repository → Settings → Secrets and variables → Actions:
 
-| Type | Name | Value |
-|------|------|-------|
-| Variable | `BFFLESS_URL` | `https://admin.yourdomain.com` |
-| Secret | `BFFLESS_API_KEY` | Your API key |
+| Type     | Name              | Value                          |
+| -------- | ----------------- | ------------------------------ |
+| Variable | `BFFLESS_URL`     | `https://admin.yourdomain.com` |
+| Secret   | `BFFLESS_API_KEY` | Your API key                   |
 
 ## Quick Example
 
@@ -85,3 +86,4 @@ jobs:
 - [Upload Artifact Action](/deployment/github-actions/upload-artifact) - Deploy builds to BFFless
 - [Download Artifact Action](/deployment/github-actions/download-artifact) - Retrieve deployed builds
 - [Compare Screenshots Action](/deployment/github-actions/compare-screenshots) - Visual regression testing
+- [Compare Coverage Action](/deployment/github-actions/compare-coverage) - Code coverage regression detection
