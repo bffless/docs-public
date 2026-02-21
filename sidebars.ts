@@ -57,6 +57,7 @@ const sidebars: SidebarsConfig = {
           items: [
             'deployment/github-actions/upload-artifact',
             'deployment/github-actions/download-artifact',
+            'deployment/github-actions/compare-screenshots',
           ],
         },
         'deployment/umbrel',
