@@ -28,6 +28,16 @@ Compare screenshots between your PR and production for visual regression testing
 
 Perfect for teams that want to catch unintended visual changes before merging.
 
+### [A/B Testing](./ab-testing)
+
+Run A/B tests on your static site using BFFless traffic splitting. This recipe shows how to:
+- Deploy multiple variants as separate aliases
+- Configure percentage-based traffic distribution
+- Read the `__bffless_variant` cookie for analytics attribution
+- Send conversion data to your analytics platform
+
+Perfect for teams that want to test different copy, layouts, or features with real users.
+
 ---
 
 ## Contributing Recipes

@@ -102,6 +102,7 @@ const sidebars: SidebarsConfig = {
         id: 'recipes/index',
       },
       items: [
+        'recipes/ab-testing',
         'recipes/coverage-comparison',
         'recipes/compare-screenshots',
       ],
