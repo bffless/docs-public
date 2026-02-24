@@ -38,6 +38,16 @@ Run A/B tests on your static site using BFFless traffic splitting. This recipe s
 
 Perfect for teams that want to test different copy, layouts, or features with real users.
 
+### [Email Form Handler](./email-form-handler)
+
+Receive form submissions via email without any backend code. This recipe shows how to:
+- Configure email form handler proxy rules
+- Build contact forms with spam protection (honeypot fields)
+- Handle submissions via HTML forms or JavaScript/React
+- Route different forms to different email addresses
+
+Perfect for contact forms, feedback widgets, and lead capture on static sites.
+
 ---
 
 ## Contributing Recipes

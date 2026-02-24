@@ -105,6 +105,7 @@ const sidebars: SidebarsConfig = {
         'recipes/ab-testing',
         'recipes/coverage-comparison',
         'recipes/compare-screenshots',
+        'recipes/email-form-handler',
       ],
     },
     {

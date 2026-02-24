@@ -1,0 +1,804 @@
+# BFFless Documentation
+
+> Static asset hosting platform for frontend deployments. Self-hosted, open-source.
+
+This file contains documentation for BFFless to help LLMs understand and assist with the platform.
+
+- Website: https://bffless.app
+- Documentation: https://docs.bffless.app
+- GitHub: https://github.com/bffless/ce
+- License: O'Saasy
+
+## Table of Contents
+
+- Overview: https://docs.bffless.app/
+- Quick Start: https://docs.bffless.app/getting-started/quickstart
+- Architecture: https://docs.bffless.app/reference/architecture
+- Features: https://docs.bffless.app/features/traffic-splitting
+- API Reference: https://docs.bffless.app/reference/api
+- Configuration: https://docs.bffless.app/configuration/environment-variables
+- Storage Backends: https://docs.bffless.app/storage/overview
+- Deployment: https://docs.bffless.app/deployment/overview
+- Security: https://docs.bffless.app/reference/security
+- Troubleshooting: https://docs.bffless.app/troubleshooting
+
+---
+
+## Overview
+
+BFFless is a self-hosted static asset hosting platform designed for frontend deployments. It serves as a "Backend for Frontend" (BFF) without the backend boilerplate, allowing teams to deploy static sites, SPAs, and frontend assets with features typically requiring custom infrastructure.
+
+### Key Features
+
+- **Static Asset Hosting**: Upload and serve static files from CI/CD pipelines
+- **Traffic Splitting**: A/B testing and canary deployments with weighted distribution
+- **Proxy Rules**: Forward API requests to backend services without CORS issues
+- **Multiple Storage Backends**: S3, GCS, Azure Blob, MinIO, or local filesystem
+- **Custom Domains**: Dynamic domain mapping with automatic SSL
+- **Deployment Aliases**: Named versions (production, staging, canary) pointing to specific commits
+- **GitHub Actions Integration**: Official actions for uploading artifacts
+- **Authentication**: SuperTokens-based auth with session and API key support
+
+### Tech Stack
+
+- **Backend**: NestJS, TypeScript, Drizzle ORM
+- **Frontend**: React 18, Vite, Redux Toolkit, TailwindCSS
+- **Database**: PostgreSQL
+- **Authentication**: SuperTokens
+- **Reverse Proxy**: nginx
+- **Container**: Docker, Docker Compose
+
+---
+
+## Quick Start
+
+Deploy BFFless in under 5 minutes.
+
+### Prerequisites
+
+- Linux server (Ubuntu 22.04+ recommended)
+- Docker and Docker Compose installed
+- A domain name
+- Port 443 open (port 80 also needed if not using Cloudflare)
+
+### SSL Options
+
+**Cloudflare (Recommended)**:
+- SSL certificates with 15-year validity
+- DDoS protection and CDN caching included
+- No certbot or port 80 required
+
+**Let's Encrypt**:
+- Direct connection to your server
+- Certificates auto-renew every 90 days
+- Requires port 80 open for verification
+
+### Installation
+
+```bash
+# Clone the repository
+git clone https://github.com/bffless/ce.git
+cd ce
+
+# Copy and configure environment
+cp .env.example .env
+# Edit .env with your domain and secrets
+
+# Generate encryption key
+echo "ENCRYPTION_KEY=$(openssl rand -base64 32)" >> .env
+
+# Start services
+./start.sh
+```
+
+### First Deployment
+
+1. Access admin panel at `https://admin.yourdomain.com`
+2. Complete setup wizard
+3. Create an API key
+4. Use GitHub Action to upload assets:
+
+```yaml
+- uses: bffless/upload-artifact@v1
+  with:
+    api-url: ${{ secrets.BFFLESS_URL }}
+    api-key: ${{ secrets.BFFLESS_API_KEY }}
+    files: |
+      dist/**/*
+```
+
+---
+
+## Architecture
+
+### System Overview
+
+```
+Internet → nginx (SSL, routing) → Backend (NestJS API) → Storage (S3/GCS/Azure/MinIO)
+                                       ↓
+                                  PostgreSQL
+                                       ↓
+                                  SuperTokens (Auth)
+```
+
+### Components
+
+**nginx (Reverse Proxy)**:
+- SSL/TLS termination
+- Routing requests based on domain/subdomain
+- Serving frontend static files
+- Proxying API requests to backend
+- Dynamic domain configuration via file watcher
+
+**Backend (NestJS API)**:
+- REST API server
+- Asset upload/download handling
+- Deployment management
+- Storage adapter layer
+- Dynamic nginx config generation
+
+**Admin Dashboard (React SPA)**:
+- Project management
+- Deployment viewing
+- Settings configuration
+- API key management
+
+**PostgreSQL (Database)**:
+- User accounts
+- Projects and deployments
+- API keys
+- Domain mappings
+- System configuration
+
+**SuperTokens (Authentication)**:
+- Email/password authentication
+- Session management with JWT
+- Automatic token refresh
+
+### Domain Routing
+
+| Domain | Routes To |
+|--------|-----------|
+| `admin.domain.com` | Admin Dashboard |
+| `domain.com/api/*` | Backend API |
+| `www.domain.com` | Deployed content |
+| `*.domain.com` | Custom domains |
+
+### Storage Key Format
+
+```
+{owner}/{repo}/{commitSha}/{path/to/file}
+```
+
+Example: `acme-corp/web-app/abc123def/index.html`
+
+---
+
+## Features
+
+### Traffic Splitting
+
+Split traffic across deployment aliases for A/B testing, canary deployments, or personalized content delivery.
+
+**How It Works**:
+1. Configure percentage weights for each alias
+2. Incoming requests distributed based on weights
+3. Sticky sessions maintain user consistency via cookies
+4. Traffic rules can override weights for specific conditions
+
+**Configuration Options**:
+- Alias weights (must total 100%)
+- Sticky sessions with configurable expiration
+- Traffic rules (query parameters, cookies)
+
+**Use Cases**:
+- A/B Testing: Compare two versions (50/50 split)
+- Canary Deployments: Gradual rollout (5% → 20% → 50% → 100%)
+- Personalized Content: Custom versions for specific audiences
+
+**Cookie**: `__bffless_variant` stores selected alias
+**Header**: `X-Variant` returns selected variant
+
+### Proxy Rules
+
+Forward API requests to backend services without CORS configuration.
+
+**Two-Level Configuration**:
+1. Project Defaults: Apply to all aliases and SHA URLs
+2. Alias Overrides: Override for specific aliases
+
+**Path Pattern Types**:
+- Prefix wildcards: `/api/*` matches `/api/users`, `/api/posts`
+- Suffix wildcards: `*.json` matches `/config.json`
+- Exact match: `/graphql` matches only `/graphql`
+
+**Strip Prefix Option**:
+- Enabled: `/api/users` → `target.com/users`
+- Disabled: `/api/users` → `target.com/api/users`
+
+**Header Configuration**:
+```json
+{
+  "headerConfig": {
+    "add": {
+      "X-API-Key": "your-secret-key",
+      "Authorization": "Bearer token"
+    }
+  }
+}
+```
+
+**Security**:
+- HTTPS required for all targets
+- SSRF protection blocks internal IPs
+- Header values encrypted at rest
+
+### Share Links
+
+Share private content without requiring login.
+
+Generate time-limited or permanent share links for:
+- Preview deployments with stakeholders
+- Share test results with team members
+- Provide access to specific versions
+
+### Deployment Aliases
+
+Named references to specific commit SHAs.
+
+**SHA URL (Immutable)**:
+```
+/repo/{owner}/{repo}/{commitSha}/path/to/file
+```
+
+**Alias URL (Mutable)**:
+```
+/repo/{owner}/{repo}/alias/{alias}/path/to/file
+```
+
+**Common Aliases**:
+- `production`: Current production release
+- `staging`: Pre-release testing
+- `main`: Latest main branch build
+- `dev`: Development builds
+
+---
+
+## API Reference
+
+### Base URL
+
+| Environment | Base URL |
+|-------------|----------|
+| Local | `http://localhost:3000` |
+| Production | `https://admin.yourdomain.com` |
+
+### Authentication
+
+**Session Authentication (Web)**:
+```
+Cookie: sAccessToken=...; sIdRefreshToken=...
+```
+
+**API Key Authentication (CI/CD)**:
+```
+X-API-Key: your-api-key
+```
+
+### Endpoints
+
+**Authentication**:
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| POST | `/api/auth/signup` | None | Register new user |
+| POST | `/api/auth/signin` | None | Login user |
+| POST | `/api/auth/signout` | Session | Logout user |
+| GET | `/api/auth/session` | Session | Get session info |
+
+**Assets**:
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| POST | `/api/assets/upload` | API Key | Upload asset(s) |
+| GET | `/api/assets/:id` | Session | Get asset metadata |
+| DELETE | `/api/assets/:id` | Session | Delete asset |
+
+**Projects**:
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| GET | `/api/projects` | Session | List projects |
+| POST | `/api/projects` | Session | Create project |
+| GET | `/api/projects/:id` | Session | Get project details |
+| PATCH | `/api/projects/:id` | Session | Update project |
+| DELETE | `/api/projects/:id` | Session | Delete project |
+
+**Deployments**:
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| GET | `/api/deployments` | Session | List deployments |
+| POST | `/api/deployments` | API Key | Create deployment |
+| GET | `/api/deployments/:id` | Session | Get deployment |
+| DELETE | `/api/deployments/:id` | Session | Delete deployment |
+
+**Aliases**:
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| GET | `/api/aliases` | Session | List aliases |
+| POST | `/api/aliases` | Session | Create alias |
+| PATCH | `/api/aliases/:id` | Session | Update alias |
+| DELETE | `/api/aliases/:id` | Session | Delete alias |
+
+**Public Access**:
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| GET | `/public/:owner/:repo/:ref/*` | None | Access public asset |
+| GET | `/repo/:owner/:repo/:sha/*` | Optional | Access asset by SHA |
+| GET | `/repo/:owner/:repo/alias/:alias/*` | Optional | Access asset by alias |
+
+**Proxy Rules**:
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/proxy-rules/project/:projectId` | List project rules |
+| POST | `/api/proxy-rules/project/:projectId` | Create project rule |
+| GET | `/api/proxy-rules/alias/:aliasId` | List alias rules |
+| POST | `/api/proxy-rules/alias/:aliasId` | Create alias rule |
+| PATCH | `/api/proxy-rules/:id` | Update rule |
+| DELETE | `/api/proxy-rules/:id` | Delete rule |
+
+### Upload Asset Example
+
+```bash
+curl -X POST https://admin.yourdomain.com/api/assets/upload \
+  -H "X-API-Key: your-api-key" \
+  -F "file=@dist/index.html" \
+  -F "owner=myorg" \
+  -F "repo=myrepo" \
+  -F "commitSha=abc123def456"
+```
+
+**Response**:
+```json
+{
+  "success": true,
+  "assets": [
+    {
+      "id": "uuid",
+      "fileName": "index.html",
+      "storageKey": "myorg/myrepo/abc123def456/index.html",
+      "mimeType": "text/html",
+      "size": 12345,
+      "url": "/repo/myorg/myrepo/abc123def456/index.html"
+    }
+  ]
+}
+```
+
+### Error Responses
+
+```json
+{
+  "statusCode": 400,
+  "message": "Validation failed",
+  "error": "Bad Request"
+}
+```
+
+| Code | Meaning |
+|------|---------|
+| 200 | Success |
+| 201 | Created |
+| 400 | Bad Request |
+| 401 | Unauthorized |
+| 403 | Forbidden |
+| 404 | Not Found |
+| 409 | Conflict |
+| 500 | Internal Server Error |
+
+### Rate Limiting
+
+- Default: 100 requests/minute per IP
+- Upload endpoints: 10 requests/minute per API key
+
+Headers:
+```
+X-RateLimit-Limit: 100
+X-RateLimit-Remaining: 95
+X-RateLimit-Reset: 1640000000
+```
+
+---
+
+## Configuration
+
+### Environment Variables
+
+**Required**:
+| Variable | Description |
+|----------|-------------|
+| `ENCRYPTION_KEY` | AES-256 key for encrypting storage credentials |
+| `POSTGRES_PASSWORD` | PostgreSQL password |
+| `PRIMARY_DOMAIN` | Main domain (e.g., `yourdomain.com`) |
+| `FRONTEND_URL` | URL users access (e.g., `https://www.yourdomain.com`) |
+
+**Security**:
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `JWT_SECRET` | Auto-generated | JWT signing secret |
+| `API_KEY_SALT` | Auto-generated | Salt for hashing API keys |
+| `COOKIE_SECURE` | `false` | Use HTTPS-only cookies |
+| `COOKIE_DOMAIN` | - | Cookie domain (e.g., `.yourdomain.com`) |
+
+**Storage**:
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `STORAGE_TYPE` | `minio` | Storage backend (`local`, `minio`, `s3`, `gcs`, `azure`) |
+| `MINIO_ROOT_USER` | `minioadmin` | MinIO admin username |
+| `MINIO_ROOT_PASSWORD` | `changeme` | MinIO admin password |
+| `MINIO_BUCKET` | `assets` | Bucket name |
+
+**Authentication**:
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `SUPERTOKENS_CONNECTION_URI` | `http://supertokens:3567` | SuperTokens server URL |
+
+**SSL**:
+| Variable | Description |
+|----------|-------------|
+| `CERTBOT_EMAIL` | Email for Let's Encrypt notifications |
+| `SSL_CERT_PATH` | Directory for SSL certificates |
+
+### Generate Secrets
+
+```bash
+echo "ENCRYPTION_KEY=$(openssl rand -base64 32)"
+echo "JWT_SECRET=$(openssl rand -base64 32)"
+echo "API_KEY_SALT=$(openssl rand -base64 32)"
+echo "POSTGRES_PASSWORD=$(openssl rand -base64 32)"
+echo "MINIO_ROOT_PASSWORD=$(openssl rand -base64 32)"
+```
+
+### Production Example
+
+```env
+PRIMARY_DOMAIN=yourdomain.com
+FRONTEND_URL=https://www.yourdomain.com
+COOKIE_SECURE=true
+COOKIE_DOMAIN=.yourdomain.com
+CERTBOT_EMAIL=admin@yourdomain.com
+ENCRYPTION_KEY=<generate-with-openssl>
+POSTGRES_PASSWORD=<generate-with-openssl>
+```
+
+---
+
+## Storage Backends
+
+BFFless supports multiple storage backends with a unified interface.
+
+### Comparison
+
+| Feature | Local | MinIO | S3 | GCS | Azure |
+|---------|-------|-------|-----|-----|-------|
+| Self-hosted | Yes | Yes | No | No | No |
+| Presigned URLs | No | Yes | Yes | Yes | Yes |
+| Versioning | No | Yes | Yes | Yes | Yes |
+| Managed Service | No | No | Yes | Yes | Yes |
+
+### AWS S3
+
+```env
+STORAGE_TYPE=s3
+S3_REGION=us-east-1
+S3_BUCKET=my-bffless-bucket
+S3_ACCESS_KEY_ID=AKIA...
+S3_SECRET_ACCESS_KEY=...
+```
+
+Also works with S3-compatible services:
+- DigitalOcean Spaces
+- Backblaze B2
+- Cloudflare R2
+- Wasabi
+
+### Google Cloud Storage
+
+```env
+STORAGE_TYPE=gcs
+GCS_PROJECT_ID=my-project
+GCS_BUCKET=my-bffless-bucket
+GCS_KEY_FILE=/path/to/service-account.json
+```
+
+### Azure Blob Storage
+
+```env
+STORAGE_TYPE=azure
+AZURE_STORAGE_ACCOUNT=mystorageaccount
+AZURE_STORAGE_KEY=...
+AZURE_CONTAINER=bffless-assets
+```
+
+### MinIO (Self-Hosted)
+
+```env
+STORAGE_TYPE=minio
+MINIO_ENDPOINT=minio
+MINIO_PORT=9000
+MINIO_ACCESS_KEY=minioadmin
+MINIO_SECRET_KEY=changeme
+MINIO_BUCKET=assets
+```
+
+### Storage Adapter Interface
+
+```typescript
+interface IStorageAdapter {
+  upload(key: string, file: Buffer, mimeType: string): Promise<void>;
+  download(key: string): Promise<Buffer>;
+  delete(key: string): Promise<void>;
+  exists(key: string): Promise<boolean>;
+  getSignedUrl(key: string, expiresIn: number): Promise<string>;
+}
+```
+
+---
+
+## Deployment
+
+### Requirements
+
+| Resource | Minimum | Recommended |
+|----------|---------|-------------|
+| RAM | 1GB | 2GB |
+| Disk | 20GB | 40GB |
+| CPU | 1 vCPU | 2 vCPU |
+
+### Subdomains
+
+| Subdomain | Purpose |
+|-----------|---------|
+| `admin.yourdomain.com` | Admin panel |
+| `www.yourdomain.com` | Primary content |
+| `minio.yourdomain.com` | MinIO console (if using MinIO) |
+| `*.yourdomain.com` | Custom domains |
+
+### Start/Stop Services
+
+```bash
+# Start with configured services
+./start.sh
+
+# Start all services
+./start.sh --all
+
+# Start without optional services
+./start.sh --minimal
+
+# Stop services
+./stop.sh
+```
+
+### Service Configuration
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `ENABLE_POSTGRES` | `true` | Run PostgreSQL in Docker |
+| `ENABLE_MINIO` | `true` | Run MinIO in Docker |
+| `ENABLE_REDIS` | `true` | Run Redis for caching |
+| `SUPERTOKENS_MODE` | `local` | `local` for Docker, `platform` for external |
+
+### GitHub Actions Integration
+
+```yaml
+name: Deploy to BFFless
+on: [push]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build
+        run: npm run build
+
+      - name: Upload to BFFless
+        uses: bffless/upload-artifact@v1
+        with:
+          api-url: ${{ secrets.BFFLESS_URL }}
+          api-key: ${{ secrets.BFFLESS_API_KEY }}
+          files: |
+            dist/**/*
+          alias: production  # Optional: update alias
+```
+
+---
+
+## Security
+
+### Authentication Layers
+
+1. **Session Auth**: Web UI (SuperTokens cookies)
+2. **API Key Auth**: CI/CD (`X-API-Key` header)
+3. **Public Access**: Public assets (no auth required)
+
+### Session Security
+
+| Setting | Development | Production |
+|---------|-------------|------------|
+| Cookie `Secure` | `false` | `true` |
+| Cookie `HttpOnly` | `true` | `true` |
+| Cookie `SameSite` | `Lax` | `Strict` |
+
+### Data Protection
+
+**Encryption at Rest**:
+- Storage credentials: AES-256 using `ENCRYPTION_KEY`
+- API keys: bcrypt hashed
+- Passwords: bcrypt (via SuperTokens)
+
+**Encryption in Transit**:
+- HTTPS required in production
+- TLS 1.2+ for all connections
+
+### SSRF Protection
+
+Blocked targets:
+- `127.0.0.0/8` (localhost)
+- `10.0.0.0/8` (private)
+- `172.16.0.0/12` (private)
+- `192.168.0.0/16` (private)
+- `169.254.0.0/16` (link-local/metadata)
+
+### Security Headers
+
+```
+X-Frame-Options: DENY
+X-Content-Type-Options: nosniff
+X-XSS-Protection: 1; mode=block
+Strict-Transport-Security: max-age=31536000; includeSubDomains
+```
+
+### Security Checklist
+
+**Before Production**:
+- [ ] `COOKIE_SECURE=true`
+- [ ] HTTPS with valid certificate
+- [ ] Strong passwords for all services
+- [ ] Firewall configured (ports 80, 443, 22 only)
+- [ ] `ENCRYPTION_KEY` backed up securely
+
+**Regular Maintenance**:
+- [ ] Update Docker images monthly
+- [ ] Rotate API keys quarterly
+- [ ] Review user access monthly
+- [ ] Check SSL certificate expiry
+
+---
+
+## Troubleshooting
+
+### Common Issues
+
+**Connection Refused**:
+- Verify Docker services are running: `docker compose ps`
+- Check logs: `docker compose logs backend`
+
+**Authentication Failed**:
+- Clear browser cookies
+- Check `COOKIE_DOMAIN` matches your domain
+- Verify SuperTokens is running
+
+**Upload Failed**:
+- Verify API key is valid and not expired
+- Check storage credentials
+- Ensure project exists
+
+**SSL Certificate Issues**:
+- For Cloudflare: Verify origin certificate is installed
+- For Let's Encrypt: Check port 80 is open
+
+**Storage Access Denied**:
+- Verify IAM permissions
+- Check bucket exists and is accessible
+- Test credentials with provider's CLI
+
+### Logs
+
+```bash
+# All services
+docker compose logs -f
+
+# Specific service
+docker compose logs -f backend
+docker compose logs -f nginx
+
+# Recent logs
+docker compose logs --tail=100 backend
+```
+
+### Health Check
+
+```bash
+# API health
+curl https://admin.yourdomain.com/api/health
+
+# Service status
+docker compose ps
+```
+
+---
+
+## GitHub Actions
+
+### Upload Artifact Action
+
+```yaml
+- uses: bffless/upload-artifact@v1
+  with:
+    api-url: ${{ secrets.BFFLESS_URL }}
+    api-key: ${{ secrets.BFFLESS_API_KEY }}
+    files: |
+      dist/**/*
+      coverage/**/*.html
+    alias: production  # Optional
+```
+
+**Inputs**:
+| Input | Required | Description |
+|-------|----------|-------------|
+| `api-url` | Yes | BFFless API URL |
+| `api-key` | Yes | API key |
+| `files` | Yes | Glob patterns for files |
+| `owner` | No | Override repository owner |
+| `repo` | No | Override repository name |
+| `commit-sha` | No | Override commit SHA |
+| `alias` | No | Create/update deployment alias |
+
+### Download Artifact Action
+
+```yaml
+- uses: bffless/download-artifact@v1
+  with:
+    api-url: ${{ secrets.BFFLESS_URL }}
+    api-key: ${{ secrets.BFFLESS_API_KEY }}
+    owner: myorg
+    repo: myrepo
+    ref: production
+    path: ./downloaded
+```
+
+### Compare Screenshots Action
+
+Visual regression testing for pull requests.
+
+### Compare Coverage Action
+
+Code coverage comparison for pull requests.
+
+---
+
+## Instructions for LLM Agents
+
+When assisting with BFFless:
+
+1. **Installation**: Recommend Cloudflare SSL for simplicity, Let's Encrypt for direct connections
+2. **Storage**: MinIO for self-hosted, cloud provider storage (S3/GCS/Azure) for managed
+3. **Security**: Always emphasize `ENCRYPTION_KEY` backup, HTTPS in production
+4. **Traffic Splitting**: Explain sticky sessions and weighted distribution
+5. **Proxy Rules**: Note SSRF protection and HTTPS requirement
+6. **API Keys**: Recommend project-scoped over global, with expiration
+
+**Current Best Practices**:
+- Use `bffless/upload-artifact@v1` GitHub Action
+- Set `COOKIE_SECURE=true` in production
+- Use environment-specific proxy rule overrides
+- Enable sticky sessions for A/B tests
+
+**Deprecated Patterns**:
+- Direct API calls for uploads (use GitHub Action instead)
+- Global API keys (use project-scoped)
+- HTTP targets in proxy rules (HTTPS required)
+
+---
+
+For more detailed information, visit https://docs.bffless.app
