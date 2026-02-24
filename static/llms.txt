@@ -114,10 +114,12 @@ echo "ENCRYPTION_KEY=$(openssl rand -base64 32)" >> .env
 ### System Overview
 
 ```
-Internet → nginx (SSL, routing) → Backend (NestJS API) → Storage (S3/GCS/Azure/MinIO)
-                                       ↓
+Internet -> nginx (SSL, routing) -> Backend (NestJS API) -> Storage (S3/GCS/Azure/MinIO)
+                                       |
+                                       v
                                   PostgreSQL
-                                       ↓
+                                       |
+                                       v
                                   SuperTokens (Auth)
 ```
 
@@ -193,7 +195,7 @@ Split traffic across deployment aliases for A/B testing, canary deployments, or 
 
 **Use Cases**:
 - A/B Testing: Compare two versions (50/50 split)
-- Canary Deployments: Gradual rollout (5% → 20% → 50% → 100%)
+- Canary Deployments: Gradual rollout (5% -> 20% -> 50% -> 100%)
 - Personalized Content: Custom versions for specific audiences
 
 **Cookie**: `__bffless_variant` stores selected alias
@@ -213,8 +215,8 @@ Forward API requests to backend services without CORS configuration.
 - Exact match: `/graphql` matches only `/graphql`
 
 **Strip Prefix Option**:
-- Enabled: `/api/users` → `target.com/users`
-- Disabled: `/api/users` → `target.com/api/users`
+- Enabled: `/api/users` -> `target.com/users`
+- Disabled: `/api/users` -> `target.com/api/users`
 
 **Header Configuration**:
 ```json
