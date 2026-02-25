@@ -73,6 +73,11 @@ const config: Config = {
           label: 'Documentation',
         },
         {
+          href: 'https://discord.gg/BAYKm5Kv',
+          label: 'Discord',
+          position: 'right',
+        },
+        {
           href: 'https://github.com/bffless/ce',
           label: 'GitHub',
           position: 'right',
@@ -92,8 +97,12 @@ const config: Config = {
           ],
         },
         {
-          title: 'More',
+          title: 'Community',
           items: [
+            {
+              label: 'Discord',
+              href: 'https://discord.gg/BAYKm5Kv',
+            },
             {
               label: 'GitHub',
               href: 'https://github.com/bffless/ce',
