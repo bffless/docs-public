@@ -69,15 +69,75 @@ Any cloud provider works. Here are some budget-friendly options:
 
 1. Create a server with **Ubuntu 22.04+** (or your preferred Linux distro)
 2. Ensure **port 443** is open in your firewall
-3. SSH into your server and note your public IP address:
+
+## Step 2: Run the Installer
+
+Now SSH into your server and start the BFFless installer.
+
+### 2.1 Connect to Your Server
+
+From your local machine, SSH into your server and note your public IP address:
 
 ```bash
+ssh root@YOUR_SERVER_IP
 curl -4 ifconfig.me && echo
 ```
 
-You'll need this IP for the DNS configuration in the next steps.
+<img src="/img/cloudflare-6.1.png" alt="Terminal showing SSH connection to Ubuntu server with system information" className="screenshot" />
 
-## Step 2: Add Your Domain to Cloudflare
+You'll need this IP address for DNS configuration in the next steps.
+
+### 2.2 Run the Install Script
+
+Run the BFFless installer:
+
+```bash
+INSTALL_DIR=/opt/bffless sh -c "$(curl -fsSL https://raw.githubusercontent.com/bffless/ce/main/install.sh)"
+```
+
+The installer will automatically install Docker if needed and set up the BFFless platform.
+
+<!-- TODO: Add screenshot of installer starting -->
+
+### 2.3 Enter Your Domain
+
+When prompted, enter your domain name (e.g., `example.com`):
+
+<img src="/img/cloudflare-6.3.png" alt="BFFless setup script showing prerequisites check and domain prompt" className="screenshot" />
+
+### 2.4 Select Cloudflare
+
+When asked about SSL certificate method, select **1** for Cloudflare (or just press Enter for the default):
+
+<img src="/img/cloudflare-6.4.png" alt="SSL Certificate Method selection showing Cloudflare as option 1 and Let's Encrypt as option 2" className="screenshot" />
+
+### 2.5 Confirm Your Server IP
+
+The installer will detect your server's public IP address. Press Enter to confirm or enter a different IP.
+
+### 2.6 Accept Default Passwords
+
+Press Enter to accept the auto-generated defaults for:
+- **PostgreSQL password** - auto-generated secure password
+- **MinIO root user** - defaults to `minioadmin`
+- **MinIO root password** - auto-generated secure password
+- **Redis password** - auto-generated secure password
+
+For **Email Configuration**, enter `N` to skip. You can configure email later in Admin Settings.
+
+:::tip Email Provider Recommendation
+Most cloud providers block SMTP ports (25, 465, 587) for spam prevention, so direct SMTP usually won't work. Use a transactional email service like [Resend](https://resend.com), [SendGrid](https://sendgrid.com), or [Postmark](https://postmarkapp.com) instead - they use API-based delivery that works on any host.
+:::
+
+<img src="/img/cloudflare-defaults.png" alt="Installer showing auto-generated passwords for PostgreSQL, MinIO, and Redis, with SMTP configuration prompt" className="screenshot" />
+
+### 2.7 Origin Certificate Prompt
+
+When prompted "Do you have your Origin Certificate ready?", **enter `y`**.
+
+The installer will wait for you to paste your certificate. **Leave the terminal open** and continue to the next steps to configure Cloudflare and generate your Origin Certificate. You'll return to this terminal after Step 5 to paste the certificates.
+
+## Step 3: Add Your Domain to Cloudflare
 
 If your domain isn't already on Cloudflare:
 
@@ -100,25 +160,23 @@ dig NS yourdomain.com +short
 You should see Cloudflare nameservers in the output.
 :::
 
-## Step 3: Create DNS Records
+## Step 4: Create DNS Records
 
 In the Cloudflare Dashboard, go to **DNS > Records** and add these A records:
 
 <img src="/img/cloudflare-dns.png" alt="Cloudflare DNS Records showing A records for admin, wildcard, root domain, minio, and www all proxied" className="screenshot" />
 
-| Type | Name    | Content          | Proxy Status           |
-| ---- | ------- | ---------------- | ---------------------- |
-| A    | `@`     | `YOUR_SERVER_IP` | Proxied (orange cloud) |
-| A    | `www`   | `YOUR_SERVER_IP` | Proxied (orange cloud) |
-| A    | `admin` | `YOUR_SERVER_IP` | Proxied (orange cloud) |
-| A    | `minio` | `YOUR_SERVER_IP` | Proxied (orange cloud) |
-| A    | `*`     | `YOUR_SERVER_IP` | Proxied (orange cloud) |
+| Type | Name | Content          | Proxy Status           |
+| ---- | ---- | ---------------- | ---------------------- |
+| A    | `@`  | `YOUR_SERVER_IP` | Proxied (orange cloud) |
+| A    | `*`  | `YOUR_SERVER_IP` | Proxied (orange cloud) |
 
-:::info Wildcard Record
-The `*` (wildcard) record is needed for subdomain-based site deployments (e.g., `mysite.yourdomain.com`).
+:::info Why Two Records?
+- `@` covers your root domain (`yourdomain.com`)
+- `*` is a wildcard that covers all subdomains (`admin.yourdomain.com`, `www.yourdomain.com`, `mysite.yourdomain.com`, etc.)
 :::
 
-## Step 4: Generate an Origin Certificate
+## Step 5: Generate an Origin Certificate
 
 Origin Certificates encrypt traffic between Cloudflare and your server.
 
@@ -139,10 +197,19 @@ You'll see two text blocks:
 - **Private Key** - The key (starts with `-----BEGIN PRIVATE KEY-----`)
 
 :::warning Save Both Values
-**Copy both the certificate and private key now.** The private key is only shown once and cannot be retrieved later. You'll paste these during the installer setup.
+**Copy both the certificate and private key now.** The private key is only shown once and cannot be retrieved later.
 :::
 
-## Step 5: Set SSL Mode to Full (Strict)
+### Return to the Terminal
+
+Now go back to your terminal where the installer is waiting for you to paste the certificate:
+
+1. **Paste your Origin Certificate** (the full text including `-----BEGIN CERTIFICATE-----` and `-----END CERTIFICATE-----`), then press Enter on a blank line
+2. **Paste your Private Key** (the full text including `-----BEGIN PRIVATE KEY-----` and `-----END PRIVATE KEY-----`), then press Enter on a blank line
+
+The installer will save the certificates and continue to the next step.
+
+## Step 6: Set SSL Mode to Full (Strict)
 
 This ensures end-to-end encryption:
 
@@ -155,83 +222,13 @@ This ensures end-to-end encryption:
 **Flexible** mode means traffic between Cloudflare and your server is unencrypted. Always use **Full (strict)** with Origin Certificates.
 :::
 
-## Step 6: Run the Installer
+## Step 7: Setup Complete
 
-Now you're ready to run the BFFless installer on your server.
-
-### 6.1 Connect to Your Server
-
-From your local machine, SSH into your server:
-
-```bash
-ssh root@YOUR_SERVER_IP
-```
-
-<img src="/img/cloudflare-6.1.png" alt="Terminal showing SSH connection to Ubuntu server with system information" className="screenshot" />
-
-### 6.2 Run the Install Script
-
-Run the BFFless installer:
-
-```bash
-INSTALL_DIR=/opt/bffless sh -c "$(curl -fsSL https://raw.githubusercontent.com/bffless/ce/main/install.sh)"
-```
-
-The installer will automatically install Docker if needed and set up the BFFless platform.
-
-<!-- TODO: Add screenshot of installer starting -->
-
-### 6.3 Enter Your Domain
-
-When prompted, enter your domain name (e.g., `example.com`):
-
-<img src="/img/cloudflare-6.3.png" alt="BFFless setup script showing prerequisites check and domain prompt" className="screenshot" />
-
-### 6.4 Select Cloudflare
-
-When asked about SSL certificate method, select **1** for Cloudflare (or just press Enter for the default):
-
-<img src="/img/cloudflare-6.4.png" alt="SSL Certificate Method selection showing Cloudflare as option 1 and Let's Encrypt as option 2" className="screenshot" />
-
-### 6.5 Confirm Your Server IP
-
-The installer will detect your server's public IP address. Press Enter to confirm or enter a different IP:
-
-### 6.6 Accept Default Passwords
-
-Press Enter to accept the auto-generated defaults for:
-- **PostgreSQL password** - auto-generated secure password
-- **MinIO root user** - defaults to `minioadmin`
-- **MinIO root password** - auto-generated secure password
-- **Redis password** - auto-generated secure password
-
-For **Email Configuration**, enter `N` to skip. You can configure email later in Admin Settings.
-
-:::tip Email Provider Recommendation
-Most cloud providers block SMTP ports (25, 465, 587) for spam prevention, so direct SMTP usually won't work. Use a transactional email service like [Resend](https://resend.com), [SendGrid](https://sendgrid.com), or [Postmark](https://postmarkapp.com) instead - they use API-based delivery that works on any host.
-:::
-
-<img src="/img/cloudflare-defaults.png" alt="Installer showing auto-generated passwords for PostgreSQL, MinIO, and Redis, with SMTP configuration prompt" className="screenshot" />
-
-### 6.7 Paste Your Origin Certificate
-
-In Cloudflare, click the **Origin Certificate** text box to copy it to your clipboard:
-
-<img src="/img/cloudflare-6.7.png" alt="Cloudflare Origin Certificate page showing certificate text box with 'Copied to clipboard' message" className="screenshot" />
-
-When prompted, enter `y` to confirm you have your Origin Certificate ready. Then paste it into the terminal (the full text including the `BEGIN` and `END` lines), and press Enter on a blank line:
-
-<img src="/img/cloudflare-6.7-b.png" alt="Terminal showing certificate paste prompt with BEGIN CERTIFICATE being pasted" className="screenshot" />
-
-### 6.8 Paste Your Private Key
-
-Next, paste your **Private Key** (the full text including the `BEGIN` and `END` lines), then press Enter on a blank line.
-
-The installer will save the certificates and show the "Setup Complete" screen:
+After pasting the certificates, the installer will show the "Setup Complete" screen:
 
 <img src="/img/cloudflare-setup-complete.png" alt="Setup Complete screen showing next steps including DNS configuration and start command" className="screenshot" />
 
-## Step 7: Start and Complete Setup
+## Step 8: Start and Complete Setup
 
 ```bash
 cd /opt/bffless

@@ -15,13 +15,9 @@ BFFless is a self-hosted platform for hosting static assets and build artifacts 
 
 ## Quick Start
 
-Deploy in under 5 minutes:
+Get BFFless running in under 5 minutes with our step-by-step guide.
 
-```bash
-sh -c "$(curl -fsSL https://raw.githubusercontent.com/bffless/ce/main/install.sh)"
-```
-
-Or follow the [manual setup guide](/getting-started/manual-setup) for full control.
+<a href="/getting-started/quickstart" class="button button--primary button--lg">Get Started →</a>
 
 ## Key Features
 
