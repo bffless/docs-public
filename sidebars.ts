@@ -34,6 +34,7 @@ const sidebars: SidebarsConfig = {
         'features/proxy-rules',
         'features/authorization',
         'features/repository-overview',
+        'features/pipelines',
       ],
     },
     {
