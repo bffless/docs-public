@@ -125,7 +125,7 @@ Create a Pipeline to increment and update the count.
 
 First, fetch the current count (same as the GET pipeline):
 
-<img src="/img/recipe-state-data-update-count-2.png" alt="Query Records handler for POST pipeline" className="screenshot" />
+<img src="/img/recipe-state-data-update-count-2.png" alt="Query Records handler in pipeline list" className="screenshot" />
 
 | Setting | Value |
 |---------|-------|
@@ -134,13 +134,15 @@ First, fetch the current count (same as the GET pipeline):
 | **Record ID** | The UUID of your click_count record |
 | **Return Single Object** | Enabled |
 
+<img src="/img/recipe-state-data-update-count-3.png" alt="Query Records handler detail configuration" className="screenshot" />
+
 Name this step `query`.
 
 ### Add Handler 2: Custom Function
 
 Add a Function Handler to increment the count:
 
-<img src="/img/recipe-state-data-update-count-3.png" alt="Custom Function handler configuration" className="screenshot" />
+<img src="/img/recipe-state-data-update-count-4.png" alt="Custom Function handler configuration" className="screenshot" />
 
 ```javascript
 const count = data.steps.query.value.count;
@@ -162,7 +164,7 @@ Name this step `updateCountFunction`.
 
 Update the DB Record with the new values:
 
-<img src="/img/recipe-state-data-update-count-4.png" alt="Update Records handler configuration" className="screenshot" />
+<img src="/img/recipe-state-data-update-count-5.png" alt="Update Records handler configuration" className="screenshot" />
 
 | Setting | Value |
 |---------|-------|
@@ -178,7 +180,7 @@ Map the update fields:
 
 Return the updated count:
 
-<img src="/img/recipe-state-data-update-count-5.png" alt="HTTP Response for POST pipeline" className="screenshot" />
+<img src="/img/recipe-state-data-update-count-6.png" alt="HTTP Response for POST pipeline" className="screenshot" />
 
 | Setting | Value |
 |---------|-------|
