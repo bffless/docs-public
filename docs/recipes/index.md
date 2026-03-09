@@ -48,6 +48,16 @@ Receive form submissions via email without any backend code. This recipe shows h
 
 Perfect for contact forms, feedback widgets, and lead capture on static sites.
 
+### [Server-Side State](./state-management)
+
+Store and update application state using Data Tables and Pipelines. This recipe shows how to:
+- Create a key-value store schema in DB Records
+- Build GET/POST API endpoints with Pipelines
+- Use Custom Functions for state transformations
+- Access state from frontend JavaScript/React
+
+Perfect for counters, feature flags, user preferences, and any server-persisted state on static sites.
+
 ---
 
 ## Contributing Recipes

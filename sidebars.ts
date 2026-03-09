@@ -107,6 +107,7 @@ const sidebars: SidebarsConfig = {
         'recipes/coverage-comparison',
         'recipes/compare-screenshots',
         'recipes/email-form-handler',
+        'recipes/state-management',
       ],
     },
     {
