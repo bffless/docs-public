@@ -35,6 +35,7 @@ const sidebars: SidebarsConfig = {
         'features/authorization',
         'features/repository-overview',
         'features/pipelines',
+        'features/ai-pipelines',
       ],
     },
     {
