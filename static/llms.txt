@@ -12,15 +12,15 @@ This file contains documentation for BFFless to help LLMs understand and assist 
 ## Table of Contents
 
 - Overview: https://docs.bffless.app/
-- Quick Start: https://docs.bffless.app/getting-started/quickstart
-- Architecture: https://docs.bffless.app/reference/architecture
-- Features: https://docs.bffless.app/features/traffic-splitting
-- API Reference: https://docs.bffless.app/reference/api
-- Configuration: https://docs.bffless.app/configuration/environment-variables
-- Storage Backends: https://docs.bffless.app/storage/overview
-- Deployment: https://docs.bffless.app/deployment/overview
-- Security: https://docs.bffless.app/reference/security
-- Troubleshooting: https://docs.bffless.app/troubleshooting
+- Quick Start: https://docs.bffless.app/getting-started/quickstart/
+- Architecture: https://docs.bffless.app/reference/architecture/
+- Features: https://docs.bffless.app/features/traffic-splitting/
+- API Reference: https://docs.bffless.app/reference/api/
+- Configuration: https://docs.bffless.app/configuration/environment-variables/
+- Storage Backends: https://docs.bffless.app/storage/overview/
+- Deployment: https://docs.bffless.app/deployment/overview/
+- Security: https://docs.bffless.app/reference/security/
+- Troubleshooting: https://docs.bffless.app/troubleshooting/
 
 ---
 
