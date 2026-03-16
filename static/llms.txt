@@ -15,6 +15,9 @@ This file contains documentation for BFFless to help LLMs understand and assist 
 - Quick Start: https://docs.bffless.app/getting-started/quickstart/
 - Architecture: https://docs.bffless.app/reference/architecture/
 - Features: https://docs.bffless.app/features/traffic-splitting/
+- Pipelines: https://docs.bffless.app/features/pipelines/
+- AI Pipelines: https://docs.bffless.app/features/ai-pipelines/
+- Chat: https://docs.bffless.app/features/chat/
 - API Reference: https://docs.bffless.app/reference/api/
 - Configuration: https://docs.bffless.app/configuration/environment-variables/
 - Storage Backends: https://docs.bffless.app/storage/overview/
@@ -31,6 +34,8 @@ BFFless is a self-hosted static asset hosting platform designed for frontend dep
 ### Key Features
 
 - **Static Asset Hosting**: Upload and serve static files from CI/CD pipelines
+- **Pipelines**: Build backend workflows (forms, data storage, email) by chaining handlers — no server code required
+- **AI Pipelines & Chat**: Add AI-powered chat with streaming responses, skills, and message persistence using OpenAI, Anthropic, or Google AI
 - **Traffic Splitting**: A/B testing and canary deployments with weighted distribution
 - **Proxy Rules**: Forward API requests to backend services without CORS issues
 - **Multiple Storage Backends**: S3, GCS, Azure Blob, MinIO, or local filesystem
@@ -274,6 +279,136 @@ Named references to specific commit SHAs.
 - `staging`: Pre-release testing
 - `main`: Latest main branch build
 - `dev`: Development builds
+
+### Pipelines
+
+Build backend automation workflows by chaining handlers together — no server code required. Pipelines let you create APIs, process forms, store data, and send emails, all configured through the admin UI.
+
+**How It Works**:
+1. Create a pipeline with an endpoint path (e.g., `/api/contact`)
+2. Add handlers that execute sequentially
+3. Each handler passes its output to the next via context
+4. If any handler fails, the pipeline stops and returns an error
+
+**Handler Library**:
+| Handler | Description |
+|---------|-------------|
+| Form Handler | Validates incoming form data against a schema |
+| Data Create | Creates a new record in a DB Record table |
+| Data Query | Retrieves records from a DB Record table |
+| Data Update | Updates existing records in a DB Record table |
+| Data Delete | Deletes records from a DB Record table |
+| Email Handler | Sends transactional emails |
+| Response Handler | Returns a custom JSON response |
+| Function Handler | Runs custom JavaScript for transformations |
+| Aggregate Handler | Performs aggregations (count, sum, avg) on data |
+
+**DB Records**: Built-in data storage for pipelines. Define schemas with field types (String, Number, Boolean, Date, Email, JSON). Every record gets auto-generated `id`, `createdAt`, and `updatedAt` fields.
+
+**Expression Syntax**: Use `{{expression}}` to reference data between steps:
+- `{{input.email}}` — Request body data
+- `{{query.page}}` — URL query parameters
+- `{{steps.createRecord.id}}` — Previous handler output
+- `{{user.email}}` — Authenticated user info
+
+**Validators**:
+- Auth Required — Require authentication to access the pipeline
+- Rate Limiting — Limit request frequency per IP or user
+
+**Example: Contact Form Pipeline**:
+Form Handler (validate) → Data Create (store) → Email Handler (notify admin) → Response Handler (success message)
+
+Documentation: https://docs.bffless.app/features/pipelines/
+
+### AI Pipelines
+
+Add AI-powered chat and content generation to your site using pipeline handlers. The AI handler integrates directly into pipelines, supporting real-time streaming chat, single-response generation, and conversation persistence.
+
+**Supported Providers**:
+| Provider | Models | Default |
+|----------|--------|---------|
+| OpenAI | gpt-4o, gpt-4-turbo, gpt-4, gpt-4o-mini, gpt-3.5-turbo | gpt-4o |
+| Anthropic | claude-opus-4-6, claude-sonnet-4-6, claude-haiku-4-5 | claude-sonnet-4-6 |
+| Google AI | gemini-1.5-pro, gemini-1.5-flash, gemini-1.5-flash-8b | gemini-1.5-pro |
+
+**Two Modes**:
+- **Chat mode** — Interactive conversations with streaming responses, compatible with the AI SDK `useChat` hook
+- **Completion mode** — Single AI-generated responses for form processing, content generation, or any pipeline step
+
+**Response Formats**:
+- **Stream (SSE)** — Real-time token-by-token output for chat interfaces. Terminal step in a pipeline (no subsequent handlers run)
+- **JSON** — Complete response as JSON, available to subsequent steps via `steps.<stepName>.content`
+
+**Quick Start**:
+1. Configure an AI provider in **Settings → AI** (add API key, select model, test connection)
+2. Generate a chat schema in **Pipelines → DB Records → Generate Schema → Chat Schema**
+3. Connect your frontend using the AI SDK `useChat` hook
+
+**Message Persistence**: Optionally persist conversations and messages to DB Records. The handler auto-manages conversation metadata (message count, total tokens, model) and individual messages (role, content, tokens).
+
+**AI Skills**: Extend your chatbot with domain-specific knowledge using markdown files deployed alongside your site:
+- Create `SKILL.md` files in `.bffless/skills/` with YAML frontmatter (name, description) and markdown instructions
+- Deploy skills using `bffless/upload-artifact` GitHub Action
+- Skills are versioned with each deployment, git-managed, rollback-safe, and A/B testable
+- Configure skill modes: None, All, or Selected
+
+**Configuration**:
+| Setting | Description | Options |
+|---------|-------------|---------|
+| Mode | Chat or Completion | `chat`, `completion` |
+| Provider | AI provider | `openai`, `anthropic`, `google` |
+| Response Format | Stream or JSON | `stream`, `message` |
+| System Prompt | Instructions for the AI | Free-text (supports expressions) |
+| Temperature | Response creativity | `0` – `2` (default: `0.7`) |
+| Max Tokens | Maximum output length | `256` – `100000` (default: `4096`) |
+| Max History | Messages in context (chat mode) | `0` – `200` (default: `50`) |
+| Skills Mode | Which skills to enable | `none`, `all`, `selected` |
+
+**Security**: API keys are encrypted at rest using AES-256-GCM, never exposed in pipeline configs, and masked in the admin UI.
+
+Documentation: https://docs.bffless.app/features/ai-pipelines/
+
+### Chat
+
+Add an AI-powered chat experience to any site with no backend code. Choose between a full page chat interface or a popup widget.
+
+**Two Layouts**:
+- **Full Page Chat** — Standalone chat page with suggested prompts, streaming, and markdown rendering. Best for: support pages, knowledge base assistants, internal tools
+- **Popup Widget** — Floating chat bubble that opens a slide-up chat panel. Best for: landing pages, documentation sites, e-commerce
+
+**Quick Start**:
+1. Generate a Chat Schema in **Pipelines → DB Records → Generate Schema → Chat Schema** (choose user-scoped or guest-scoped)
+2. Connect your frontend using the AI SDK `useChat` hook
+3. Deploy with `bffless/upload-artifact` GitHub Action
+
+**Frontend Example**:
+```tsx
+import { useChat } from '@ai-sdk/react';
+
+function Chat() {
+  const { messages, input, handleInputChange, handleSubmit, status } = useChat({
+    api: '/api/chat',
+  });
+
+  return (
+    <div>
+      {messages.map((m) => (
+        <div key={m.id}>
+          <strong>{m.role}:</strong> {m.parts.map(p => p.text).join('')}
+        </div>
+      ))}
+      <form onSubmit={handleSubmit}>
+        <input value={input} onChange={handleInputChange} placeholder="Type a message..." />
+        <button type="submit" disabled={status === 'streaming'}>Send</button>
+      </form>
+    </div>
+  );
+}
+```
+
+**Demo**: Live examples at https://chat.docs.bffless.app/ (full page) and https://chat.docs.bffless.app/popup/ (popup widget). Source: https://github.com/bffless/demo-chat
+
+Documentation: https://docs.bffless.app/features/chat/
 
 ---
 
