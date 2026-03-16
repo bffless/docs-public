@@ -36,6 +36,7 @@ const sidebars: SidebarsConfig = {
         'features/repository-overview',
         'features/pipelines',
         'features/ai-pipelines',
+        'features/chat',
       ],
     },
     {

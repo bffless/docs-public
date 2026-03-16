@@ -57,9 +57,10 @@ Deploy BFFless in under 5 minutes.
 ### Prerequisites
 
 - Linux server (Ubuntu 22.04+ recommended)
-- Docker and Docker Compose installed
 - A domain name
 - Port 443 open (port 80 also needed if not using Cloudflare)
+
+Note: Docker is installed automatically by the install script if not already present.
 
 ### SSL Options
 
@@ -67,34 +68,44 @@ Deploy BFFless in under 5 minutes.
 - SSL certificates with 15-year validity
 - DDoS protection and CDN caching included
 - No certbot or port 80 required
+- Setup guide: https://docs.bffless.app/getting-started/cloudflare-setup
 
 **Let's Encrypt**:
 - Direct connection to your server
 - Certificates auto-renew every 90 days
 - Requires port 80 open for verification
+- Setup guide: https://docs.bffless.app/getting-started/letsencrypt-setup
 
 ### Installation
 
+Use the automated install script. It handles Docker installation, environment configuration, SSL setup, and secret generation interactively:
+
 ```bash
-# Clone the repository
-git clone https://github.com/bffless/ce.git
-cd ce
+INSTALL_DIR=/opt/bffless sh -c "$(curl -fsSL https://raw.githubusercontent.com/bffless/ce/main/install.sh)"
+```
 
-# Copy and configure environment
-cp .env.example .env
-# Edit .env with your domain and secrets
+The install script will prompt you for:
+- Your domain name
+- SSL method (Cloudflare or Let's Encrypt)
+- SSL certificates (for Cloudflare) or auto-detects them (for Let's Encrypt)
+- Service passwords (or auto-generates them)
 
-# Generate encryption key
-echo "ENCRYPTION_KEY=$(openssl rand -base64 32)" >> .env
+After the installer completes, start services:
 
-# Start services
+```bash
+cd /opt/bffless
 ./start.sh
 ```
+
+For full step-by-step instructions, see:
+- Cloudflare setup: https://docs.bffless.app/getting-started/cloudflare-setup
+- Let's Encrypt setup: https://docs.bffless.app/getting-started/letsencrypt-setup
+- Manual setup (advanced): https://docs.bffless.app/getting-started/manual-setup
 
 ### First Deployment
 
 1. Access admin panel at `https://admin.yourdomain.com`
-2. Complete setup wizard
+2. Complete the setup wizard (storage, caching, email configuration)
 3. Create an API key
 4. Use GitHub Action to upload assets:
 
