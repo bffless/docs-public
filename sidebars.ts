@@ -37,6 +37,7 @@ const sidebars: SidebarsConfig = {
         'features/pipelines',
         'features/ai-pipelines',
         'features/chat',
+        'features/mcp-server',
       ],
     },
     {
