@@ -38,6 +38,7 @@ const sidebars: SidebarsConfig = {
         'features/ai-pipelines',
         'features/chat',
         'features/mcp-server',
+        'features/claude-code-plugin',
       ],
     },
     {
