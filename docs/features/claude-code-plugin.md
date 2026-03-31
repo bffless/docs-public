@@ -35,10 +35,19 @@ If you haven't set up the MCP server yet, see the [MCP Server](/features/mcp-ser
 
 ## Installation
 
-Install the plugin from within Claude Code:
+### Via Claude Code Plugin Marketplace
+
+From within Claude Code, add the marketplace and install:
 
 ```
+/plugin marketplace add bffless/claude-skills
 /plugin install bffless
+```
+
+### Via CLI
+
+```bash
+claude plugin install bffless --scope user
 ```
 
 Then reload plugins to activate:
