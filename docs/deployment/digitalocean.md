@@ -21,8 +21,8 @@ Deploy BFFless to a DigitalOcean Droplet.
 1. Go to DigitalOcean → Create → Droplets
 2. **Image:** Ubuntu 24.04 LTS x64
 3. **Size:**
-   - Minimum: $6/mo (1GB RAM)
-   - Recommended: $12/mo (2GB RAM)
+   - Budget: $6/mo (1GB RAM) — MinIO and Redis auto-disabled to fit in memory
+   - Recommended: $12/mo (2GB RAM) — all services enabled
 4. **Authentication:** SSH keys
 5. **Hostname:** `bffless-prod`
 6. Note the IP address after creation
