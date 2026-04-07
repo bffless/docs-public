@@ -13,7 +13,7 @@ Choose the deployment method that best fits your needs.
 | Method | Best For | Complexity | Cost |
 |--------|----------|------------|------|
 | [Quick Start](/getting-started/quickstart) | First-time users | Low | Varies |
-| [DigitalOcean](/deployment/digitalocean) | Simple cloud hosting | Medium | $6-12/mo (2GB recommended) |
+| [DigitalOcean](/deployment/digitalocean) | Simple cloud hosting | Medium | $6-12/mo |
 | [GitHub Actions CI/CD](/deployment/github-actions) | Automated deployments | Medium | Free tier |
 
 ## Requirements

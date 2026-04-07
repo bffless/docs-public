@@ -170,12 +170,12 @@ Review your configuration and finalize the setup.
 
 The summary shows your configured options. If you chose **Local Filesystem** storage and **In-Memory** caching, you'll see an optimization recommendation.
 
-:::tip Save RAM by Disabling Unused Services
-If you're not using MinIO or Redis, disable them to save ~224MB RAM. Edit your `.env` file:
+:::tip Enable MinIO and Redis on 2GB+ Servers
+If your server has 2GB+ RAM, you can enable MinIO (S3-compatible object storage) and Redis (caching) for enhanced performance. Edit your `.env` file:
 
 ```bash
-ENABLE_MINIO=false
-ENABLE_REDIS=false
+ENABLE_MINIO=true
+ENABLE_REDIS=true
 ```
 
 Then restart:
@@ -185,7 +185,7 @@ Then restart:
 ./start.sh
 ```
 
-This is especially helpful on smaller VPS instances (1GB RAM).
+By default, BFFless uses local filesystem storage and in-memory caching, which works well for most deployments.
 :::
 
 Click **Complete Setup** to finish and access your dashboard.

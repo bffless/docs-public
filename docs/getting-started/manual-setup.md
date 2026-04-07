@@ -16,7 +16,7 @@ Step-by-step guide for manually deploying BFFless. Use this if you need full con
 - SSH access to your server
 
 **Minimum Requirements:**
-- 2GB RAM recommended (1GB works with reduced services — MinIO and Redis auto-disabled)
+- 1GB RAM minimum (2GB+ recommended to enable MinIO and Redis)
 - 20GB disk space
 - Ports 22, 80, 443 open
 

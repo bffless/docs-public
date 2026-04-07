@@ -50,18 +50,15 @@ Before configuring Cloudflare, you need a Linux server to host BFFless.
 | **Disk** | 25 GB SSD | 50 GB+ SSD |
 | **OS** | Ubuntu 22.04+ | Ubuntu 24.04 LTS |
 
-:::warning 1 GB RAM — Disable MinIO and Redis
-On servers with **1 GB of RAM**, you should disable MinIO and Redis to prevent out-of-memory crashes. The startup script will warn you if this is needed. Add these lines to your `.env` file:
+:::tip 2 GB+ RAM — Enable Optional Services
+On servers with **2 GB+ of RAM**, you can enable MinIO (S3-compatible object storage) and Redis (caching) for enhanced performance. Add these to your `.env` file:
 
 ```bash
-ENABLE_MINIO=false
-ENABLE_REDIS=false
+ENABLE_MINIO=true
+ENABLE_REDIS=true
 ```
 
-- **Storage** falls back to local filesystem (you can configure external S3 later via the Setup Wizard)
-- **Caching** falls back to in-memory (sufficient for single-server deployments)
-
-For the full experience with all services, use a **2 GB RAM** server ($12/mo on DigitalOcean).
+By default, BFFless uses local filesystem storage and in-memory caching, which works well for most deployments.
 :::
 
 :::danger 512 MB RAM Is Not Enough
@@ -72,16 +69,12 @@ BFFless requires at least **1 GB of RAM** to run. Servers with 512 MB RAM will e
 
 Any cloud provider works. Here are some budget-friendly options:
 
-| Provider | Recommended Plan | Price |
+| Provider | Minimum Plan | Price |
 | -------- | ------------ | ----- |
 | [Hetzner](https://www.hetzner.com/cloud) | CX22 (2 GB / 2 CPU) | ~$4/mo |
-| [DigitalOcean](https://www.digitalocean.com/) | Basic Droplet (2 GB / 1 CPU) | $12/mo |
-| [Linode](https://www.linode.com/) | Linode 2GB (2 GB / 1 CPU) | $12/mo |
-| [Vultr](https://www.vultr.com/) | Cloud Compute (2 GB / 1 CPU) | $12/mo |
-
-:::tip Budget Option
-1 GB servers ($5-6/mo) work fine — just disable MinIO and Redis in your `.env`. The startup script will warn you if this is needed.
-:::
+| [DigitalOcean](https://www.digitalocean.com/) | Basic Droplet (1 GB / 1 CPU) | $6/mo |
+| [Linode](https://www.linode.com/) | Nanode (1 GB / 1 CPU) | $5/mo |
+| [Vultr](https://www.vultr.com/) | Cloud Compute (1 GB / 1 CPU) | $6/mo |
 
 ### Server Setup
 

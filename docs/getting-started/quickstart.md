@@ -16,7 +16,7 @@ Deploy BFFless in under 5 minutes using the automated installer.
 - Port 443 open (port 80 also needed if not using Cloudflare)
 
 :::tip No Server Yet?
-You can deploy on any cloud provider. A 2GB RAM VPS ($4-12/month from Hetzner, DigitalOcean, or Linode) is recommended. 1GB servers also work — you'll need to disable MinIO and Redis in your `.env` (the startup script will guide you).
+You can deploy on any cloud provider. A basic $5-12/month VPS from DigitalOcean, Linode, or Hetzner works well. 1GB RAM is the minimum; 2GB+ lets you enable optional services like MinIO and Redis.
 :::
 
 ## Choose Your SSL Approach
