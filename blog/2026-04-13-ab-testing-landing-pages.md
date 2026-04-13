@@ -18,9 +18,9 @@ This post is about the other way to do it: deploy each variant as a static site,
 <!-- truncate -->
 
 :::info This post is itself an A/B test
-Meta moment: the page you're reading right now is being served by the exact mechanism it describes. We deployed two versions of this article as separate aliases (`blog-main` and `blog-git-native`) and BFFless is splitting traffic 50/50 between them. The headline, the lede, and a few paragraphs differ — same takeaway, different angle.
+Meta moment: the page you're reading right now is being served by the exact mechanism it describes. We deployed two versions of this article as separate aliases (`main` and `blog-git-native`) and BFFless is splitting traffic 50/50 between them. The headline, the lede, and a few paragraphs differ — same takeaway, different angle.
 
-Want to see the other variant? Append `?version=git-native` to the URL. To force the original, use `?version=main`. The `__bffless_variant` cookie will keep you on whichever you land on so the rest of the post stays consistent. Open in an incognito window to get re-rolled.
+Want to see the other variant? [Switch to `?variant=git-native`](?variant=git-native). To force the original, use [`?variant=default`](?variant=default). The `__bffless_variant` cookie will keep you on whichever you land on so the rest of the post stays consistent. Open in an incognito window to get re-rolled.
 :::
 
 <img src="/img/ab-test-split-v2.png" alt="Two variants of this blog post shown side-by-side in the BFFless blog index, each with its own hero image — left titled 'A/B Testing Landing Pages Without the Enterprise Price Tag' with a 50/50 traffic-split illustration, right titled 'Your Git Branches Are Already A/B Test Variants' with a git-branches-to-edge illustration" />
@@ -45,7 +45,7 @@ None of these are fatal on their own. Stack them together and you end up paying 
 
 Paid landing pages are the ideal case for static hosting. They're small, they're read-heavy, and the two metrics that matter most — Quality Score and conversion rate — both reward raw page speed. Shipping a landing page as a pre-built bundle gives you the fastest TTFB and LCP you can physically achieve, and it scales to any traffic spike without autoscaling config.
 
-It also means your designers and devs keep shipping in the tools they already use. Next.js, Astro, Eleventy, Hugo, a folder full of HTML — doesn't matter. Each variant is just another build artifact.
+It also means your designers and devs keep shipping in the tools they already use. React, Astro, Eleventy, Hugo, a folder full of HTML — doesn't matter. Each variant is just another build artifact.
 
 The missing piece is usually traffic splitting. That's what BFFless adds on top.
 
@@ -197,7 +197,7 @@ When the test is conclusive, flip the winner to 100% in the traffic splitting pa
 
 This isn't a full replacement for Unbounce or Instapage — BFFless is not a drag-and-drop page builder, and if your team doesn't have a dev who can ship HTML, you probably want one of those tools. But if you *do* have a dev, you get a handful of things that stop being hypothetical:
 
-- **Any framework, any CI.** Next.js, Astro, plain HTML, an internal design system — whatever builds into a static folder works.
+- **Any framework, any CI.** React, Astro, plain HTML, an internal design system — whatever builds into a static folder works.
 - **Branches are variants.** Git is your variant manager, code review is your QA process, `git revert` is your rollback.
 - **No per-page pricing.** Experiments aren't billable events. Run twenty at once if you want to.
 - **Client preview links for free.** `?version=` rules give every stakeholder a stable URL per variant without another plan tier.
