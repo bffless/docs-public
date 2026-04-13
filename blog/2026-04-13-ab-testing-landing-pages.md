@@ -18,9 +18,9 @@ This post is about wiring that router in front of your existing build pipeline. 
 <!-- truncate -->
 
 :::info This post is itself an A/B test
-Meta moment: the page you're reading right now is being served by the exact mechanism it describes. We deployed two versions of this article as separate aliases (`blog-main` and `blog-git-native`) and BFFless is splitting traffic 50/50 between them. You're currently reading the **`git-native`** variant — same takeaway as the other one, just framed for devs first instead of PPC operators.
+Meta moment: the page you're reading right now is being served by the exact mechanism it describes. We deployed two versions of this article as separate aliases (`main` and `blog-git-native`) and BFFless is splitting traffic 50/50 between them. You're currently reading the **`git-native`** variant — same takeaway as the other one, just framed for devs first instead of PPC operators.
 
-Want to see the original? Append `?version=main` to the URL. To pin yourself to this version, use `?version=git-native`. The `__bffless_variant` cookie will keep you on whichever you land on so the rest of the post stays consistent. Open in an incognito window to get re-rolled.
+Want to see the original? [Switch to `?variant=default`](?variant=default). To pin yourself to this version, use [`?variant=git-native`](?variant=git-native). The `__bffless_variant` cookie will keep you on whichever you land on so the rest of the post stays consistent. Open in an incognito window to get re-rolled.
 :::
 
 <img src="/img/ab-test-split-v2.png" alt="Two variants of this blog post shown side-by-side in the BFFless blog index, each with its own hero image — left titled 'A/B Testing Landing Pages Without the Enterprise Price Tag' with a 50/50 traffic-split illustration, right titled 'Your Git Branches Are Already A/B Test Variants' with a git-branches-to-edge illustration" />
@@ -32,7 +32,7 @@ Two things this screenshot makes obvious that a client-side A/B testing tool can
 
 ## The "just give me a router" problem
 
-Drag-and-drop builders are great at what they do. But the moment your team has a real frontend stack — a design system, a component library, a Next.js or Astro setup that already builds into `dist/` — the same friction points show up every time you try to plug a builder into your workflow:
+Drag-and-drop builders are great at what they do. But the moment your team has a real frontend stack — a design system, a component library, a React or Astro setup that already builds into `dist/` — the same friction points show up every time you try to plug a builder into your workflow:
 
 - **A/B testing is a premium feature.** Unbounce's Smart Traffic, Instapage's experimentation suite, and Leadpages' split testing all sit on plans that run $200–$600/month per seat before you're testing at any real volume.
 - **Templates cap what you can ship.** Custom components, design systems, and anything your frontend team has already built in React or Astro tend not to survive the round-trip through a WYSIWYG editor.
@@ -45,7 +45,7 @@ None of these are fatal on their own. Stack them together and you end up paying 
 
 Landing pages are the ideal case for "just ship the bundle". They're small, they're read-heavy, and the two metrics that matter most — Quality Score for paid traffic and conversion rate for everything else — both reward raw page speed. A pre-built bundle gives you the fastest TTFB and LCP you can physically achieve, and it scales to any traffic spike without an autoscaler.
 
-The other reason it's the right primitive is that you already have one. Whatever your team builds in — Next.js, Astro, Eleventy, Hugo, a folder full of HTML — produces a directory that can be served as-is. Each variant is just another version of that directory.
+The other reason it's the right primitive is that you already have one. Whatever your team builds in — React, Astro, Eleventy, Hugo, a folder full of HTML — produces a directory that can be served as-is. Each variant is just another version of that directory.
 
 The missing piece is usually traffic splitting. That's what BFFless adds on top.
 
@@ -197,7 +197,7 @@ When the test is conclusive, flip the winner to 100% in the traffic splitting pa
 
 This isn't a full replacement for Unbounce or Instapage — BFFless is not a drag-and-drop page builder, and if your team doesn't have a dev who can ship HTML, you probably want one of those tools. But if you *do* have a dev, you get a handful of things that stop being hypothetical:
 
-- **Any framework, any CI.** Next.js, Astro, plain HTML, an internal design system — whatever builds into a static folder works.
+- **Any framework, any CI.** React, Astro, plain HTML, an internal design system — whatever builds into a static folder works.
 - **Branches are variants.** Git is your variant manager, code review is your QA process, `git revert` is your rollback.
 - **No per-page pricing.** Experiments aren't billable events. Run twenty at once if you want to.
 - **Client preview links for free.** `?version=` rules give every stakeholder a stable URL per variant without another plan tier.
