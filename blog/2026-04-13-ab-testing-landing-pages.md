@@ -93,7 +93,9 @@ Turn on **sticky sessions** so return visitors stay on the same variant, and add
 Now anyone can preview a specific variant by appending `?version=headline-outcome` to the URL — which is exactly the "share a preview with the client" workflow that enterprise builders charge extra for. Send the three links to your PM, let them pick, done.
 
 :::tip Skip the admin panel
-If you use Claude Code, the [BFFless plugin](/features/claude-code-plugin) ships a `traffic-splitting` skill that knows this whole configuration shape — weights, sticky sessions, query-param rules, alias naming. Install it once:
+If you use Claude Code, the [BFFless plugin](/features/claude-code-plugin) ships a `traffic-splitting` skill that knows this whole configuration shape — weights, sticky sessions, query-param rules, alias naming. It pairs with the [BFFless MCP server](https://docs.bffless.app/features/mcp-server/), which is what actually executes the API calls — the plugin teaches Claude *how* to configure things, the MCP server gives it the tools to do it. You'll need both.
+
+Connect the MCP server once (see [MCP Server — Setup](https://docs.bffless.app/features/mcp-server/#setup) for the API key and config), then install the plugin:
 
 ```
 /plugin marketplace add bffless/claude-skills
