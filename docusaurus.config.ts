@@ -88,7 +88,7 @@ const config: Config = {
           position: 'left',
         },
         {
-          href: 'https://discord.gg/BAYKm5Kv',
+          href: 'https://discord.gg/BfyJwZqS',
           label: 'Discord',
           position: 'right',
         },
@@ -116,7 +116,7 @@ const config: Config = {
           items: [
             {
               label: 'Discord',
-              href: 'https://discord.gg/BAYKm5Kv',
+              href: 'https://discord.gg/BfyJwZqS',
             },
             {
               label: 'GitHub',
