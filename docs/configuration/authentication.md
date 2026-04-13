@@ -148,7 +148,7 @@ After configuring credentials and restarting, enable Google OAuth using either m
 FEATURE_GOOGLE_OAUTH=true
 ```
 
-This uses the built-in [feature flag system](/reference/feature-flags) — the `FEATURE_*` env vars are already supported for all flags.
+This uses the built-in feature flag system — the `FEATURE_*` env vars are already supported for all flags.
 
 ### How It Works
 

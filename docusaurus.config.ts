@@ -25,6 +25,8 @@ const config: Config = {
 
   onBrokenLinks: 'throw',
 
+  clientModules: ['./src/gtag-stub.ts'],
+
   i18n: {
     defaultLocale: 'en',
     locales: ['en'],
