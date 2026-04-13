@@ -222,9 +222,9 @@ Spin up an instance, point a client's landing page at it, and see what your expe
 
 #### The button is part of the experiment
 
-You just read a post about measuring A/B test variants with a server-side state pipeline. The **Like** button below writes a row to the exact `blog_post_likes` schema this post describes, tagged with whichever variant BFFless served you — the post is measuring itself. You made it this far; that's already the interesting part of the signal. The click is the rest of it.
+The **Like** button below is the CTA for this post — and we're tracking clicks by variant in both the BFFless backend and Google Analytics. Same mechanism this post describes, pointed at the post itself. If it was useful, the button is how we hear it.
 
-We'll publish a follow-up with the numbers in a couple of weeks: which headline won, likes per variant, bounce-rate deltas, and what the raw `db_aggregate { groupBy: "variant" }` output looked like against real traffic. If the post was useful, the button is how we hear it.
+Follow-up with the numbers in a couple of weeks — which variant won and by how much.
 
 <LikeButton slug="ab-testing-landing-pages" />
 
