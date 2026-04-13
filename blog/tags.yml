@@ -12,3 +12,8 @@ updates:
   label: Updates
   permalink: /updates
   description: Platform updates and improvements
+
+cro:
+  label: CRO
+  permalink: /cro
+  description: Conversion rate optimization, A/B testing, and landing page experiments
