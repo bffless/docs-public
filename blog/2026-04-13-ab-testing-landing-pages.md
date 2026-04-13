@@ -18,6 +18,13 @@ Meta moment: the page you're reading right now is being served by the exact mech
 Want to see the original? Append `?version=main` to the URL. To pin yourself to this version, use `?version=git-native`. The `__bffless_variant` cookie will keep you on whichever you land on so the rest of the post stays consistent. Open in an incognito window to get re-rolled.
 :::
 
+<img src="/img/ab-testing-split.png" alt="Two variants of this blog post shown side-by-side in the BFFless blog index — one titled 'A/B Testing Landing Pages Without the Enterprise Price Tag', the other titled 'Your Git Branches Are Already A/B Test Variants'" />
+
+Two things this screenshot makes obvious that a client-side A/B testing tool can't:
+
+- **It's the whole site, not a page.** Because each variant is a complete build artifact from its own git branch, the title, lede, section headings, meta description, OG card, and even the blog-index preview you see above all change together. You're not testing a button color — you're testing a whole positioning, end to end, across every URL the site serves.
+- **It's decided at build time and at the edge.** There's no flash of the wrong content, no client-side flicker, no JavaScript swap-in mid-paint. By the time the first byte of HTML reaches the browser, the variant has already been chosen — what loads is what was in `dist/`, fully cached, fully fast, indistinguishable from a regular static page.
+
 ## The "just give me a router" problem
 
 Drag-and-drop builders are great at what they do. But the moment your team has a real frontend stack — a design system, a component library, a Next.js or Astro setup that already builds into `dist/` — the same friction points show up every time you try to plug a builder into your workflow:
