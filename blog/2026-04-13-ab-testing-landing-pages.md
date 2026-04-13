@@ -21,7 +21,7 @@ Meta moment: the page you're reading right now is being served by the exact mech
 Want to see the other variant? Append `?version=git-native` to the URL. To force the original, use `?version=main`. The `__bffless_variant` cookie will keep you on whichever you land on so the rest of the post stays consistent. Open in an incognito window to get re-rolled.
 :::
 
-<img src="/img/ab-testing-split.png" alt="Two variants of this blog post shown side-by-side in the BFFless blog index — one titled 'A/B Testing Landing Pages Without the Enterprise Price Tag', the other titled 'Your Git Branches Are Already A/B Test Variants'" />
+<img src="/img/ab-test-split-v2.png" alt="Two variants of this blog post shown side-by-side in the BFFless blog index, each with its own hero image — left titled 'A/B Testing Landing Pages Without the Enterprise Price Tag' with a 50/50 traffic-split illustration, right titled 'Your Git Branches Are Already A/B Test Variants' with a git-branches-to-edge illustration" />
 
 Two things this screenshot makes obvious that a client-side A/B testing tool can't:
 
