@@ -122,6 +122,16 @@ gtag('config', 'G-T20LHNBRK6', { 'anonymize_ip': true });`,
           position: 'left',
         },
         {
+          href: 'https://bffless.app/?utm_source=docs.bffless.com&utm_medium=referral&utm_campaign=ecosystem-nav&utm_content=oss-link',
+          label: 'Open Source',
+          position: 'right',
+        },
+        {
+          href: 'https://www.bffless.com/?utm_source=docs.bffless.com&utm_medium=referral&utm_campaign=ecosystem-nav&utm_content=agency-link',
+          label: 'Agency',
+          position: 'right',
+        },
+        {
           href: 'https://discord.gg/BfyJwZqS',
           label: 'Discord',
           position: 'right',
