@@ -27,6 +27,42 @@ const config: Config = {
 
   clientModules: ['./src/gtag-stub.ts'],
 
+  // We inject gtag manually via headTags (instead of using preset-classic's
+  // gtag option) so we can call gtag('set', 'user_properties', { variant })
+  // BEFORE gtag('config', ...). The config call fires the initial page_view,
+  // and user_properties only attach to events fired AFTER they're set — so
+  // queue order in dataLayer is what determines whether the first page_view
+  // gets the variant attribution or not.
+  headTags: [
+    {
+      tagName: 'link',
+      attributes: {
+        rel: 'preconnect',
+        href: 'https://www.google-analytics.com',
+      },
+    },
+    {
+      tagName: 'script',
+      attributes: {
+        async: 'true',
+        src: 'https://www.googletagmanager.com/gtag/js?id=G-T20LHNBRK6',
+      },
+    },
+    {
+      tagName: 'script',
+      attributes: {},
+      innerHTML: `window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+try {
+  var m = document.cookie.match(/(?:^|; )__bffless_variant=([^;]*)/);
+  var v = m ? decodeURIComponent(m[1]) : new URLSearchParams(window.location.search).get('version');
+  if (v) gtag('set', 'user_properties', { variant: v });
+} catch (e) {}
+gtag('js', new Date());
+gtag('config', 'G-T20LHNBRK6', { 'anonymize_ip': true });`,
+    },
+  ],
+
   i18n: {
     defaultLocale: 'en',
     locales: ['en'],
@@ -52,10 +88,8 @@ const config: Config = {
         theme: {
           customCss: './src/css/custom.css',
         },
-        gtag: {
-          trackingID: 'G-T20LHNBRK6',
-          anonymizeIP: true,
-        },
+        // gtag is configured manually via headTags above so we can set
+        // user_properties before the initial page_view fires.
       } satisfies Preset.Options,
     ],
   ],
