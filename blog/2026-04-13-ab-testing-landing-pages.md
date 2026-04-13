@@ -12,6 +12,12 @@ This post is about the other way to do it: deploy each variant as a static site,
 
 <!-- truncate -->
 
+:::info This post is itself an A/B test
+Meta moment: the page you're reading right now is being served by the exact mechanism it describes. We deployed two versions of this article as separate aliases (`blog-main` and `blog-git-native`) and BFFless is splitting traffic 50/50 between them. The headline, the lede, and a few paragraphs differ — same takeaway, different angle.
+
+Want to see the other variant? Append `?version=git-native` to the URL. To force the original, use `?version=main`. The `__bffless_variant` cookie will keep you on whichever you land on so the rest of the post stays consistent. Open in an incognito window to get re-rolled.
+:::
+
 ## The PPC experimentation problem
 
 Drag-and-drop builders are great at what they do. But when you scale landing pages across a dozen client accounts, the same pain points show up every time:
