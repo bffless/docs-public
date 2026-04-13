@@ -20,7 +20,7 @@ This post is about the other way to do it: deploy each variant as a static site,
 :::info This post is itself an A/B test
 Meta moment: the page you're reading right now is being served by the exact mechanism it describes. We deployed two versions of this article as separate aliases (`main` and `blog-git-native`) and BFFless is splitting traffic 50/50 between them. The headline, the lede, and a few paragraphs differ — same takeaway, different angle.
 
-Want to see the other variant? [Switch to `?variant=git-native`](?variant=git-native). To force the original, use [`?variant=default`](?variant=default). The `__bffless_variant` cookie will keep you on whichever you land on so the rest of the post stays consistent. Open in an incognito window to get re-rolled.
+Want to see the other variant? <a href="/blog/ab-testing-landing-pages/?variant=git-native">Switch to <code>?variant=git-native</code></a>. To force the original, use <a href="/blog/ab-testing-landing-pages/?variant=default"><code>?variant=default</code></a>. The `__bffless_variant` cookie will keep you on whichever you land on so the rest of the post stays consistent. Open in an incognito window to get re-rolled.
 :::
 
 <img src="/img/ab-test-split-v2.png" alt="Two variants of this blog post shown side-by-side in the BFFless blog index, each with its own hero image — left titled 'A/B Testing Landing Pages Without the Enterprise Price Tag' with a 50/50 traffic-split illustration, right titled 'Your Git Branches Are Already A/B Test Variants' with a git-branches-to-edge illustration" />
