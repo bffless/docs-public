@@ -42,9 +42,52 @@ When a visitor lands on your domain, BFFless does roughly this:
 1. Check for an existing `__bffless_variant` cookie. If it's set, route to that alias.
 2. Otherwise, evaluate traffic rules (query parameters, cookies). If one matches, force that alias.
 3. Otherwise, pick an alias using weighted random selection — for weights `[50, 30, 20]`, random 0–50 routes to the first alias, 51–80 to the second, 81–100 to the third.
-4. Set the `__bffless_variant` cookie so the visitor sticks to that variant on return visits.
+4. Resolve the alias to its current deployment SHA (and optional path override), fetch the file from storage, and serve it back.
+5. Set the `__bffless_variant` cookie so the visitor sticks to that variant on return visits.
 
 The variant cookie is intentionally readable from JavaScript (not `HttpOnly`), so your analytics layer can pick it up and attribute conversions without any server-side glue. The selected alias is also returned in the `X-Variant` response header if you prefer reading it from the network layer.
+
+Visually, a single request from a first-time visitor looks like this:
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant V as Visitor
+    participant B as BFFless
+    participant C as Domain Config
+    participant S as Storage<br/>(S3 / Local FS)
+
+    V->>B: GET landing.example.com/<br/>Cookie: __bffless_variant?
+    B->>C: Lookup domain + traffic config
+
+    alt Cookie present and sticky
+        B->>B: Reuse saved alias
+    else ?version= or rule cookie matches
+        B->>C: Evaluate traffic rules
+        C-->>B: Forced alias (e.g. headline-urgency)
+    else No cookie, no rule
+        B->>B: Weighted random pick<br/>across [34, 33, 33]
+    end
+
+    B->>C: Resolve alias → SHA + path override
+    C-->>B: sha=abc123, path=/dist
+    B->>S: GET owner/repo/abc123/dist/index.html
+    S-->>B: HTML bytes
+    B-->>V: 200 OK<br/>Set-Cookie: __bffless_variant=headline-urgency<br/>X-Variant: headline-urgency
+```
+
+Step by step:
+
+1. **Request hits BFFless.** The visitor's browser sends a normal `GET /` to your landing-page domain. If they've been here before, the request also carries a `__bffless_variant` cookie naming the alias they were assigned last time.
+2. **Domain config lookup.** BFFless resolves the `Host` header to a domain mapping and pulls the traffic config for it: the list of aliases, their weights, sticky-session settings, and any traffic rules. If the domain has only one alias, this whole flow short-circuits and serves it directly.
+3. **Cookie branch — sticky session.** If sticky sessions are on and the cookie's alias is still valid (still in the weights list, or still referenced by an active rule), BFFless reuses that alias and skips selection entirely. This is why a returning visitor never flips between variants mid-test.
+4. **Rule branch — forced routing.** If there's no usable cookie, BFFless evaluates traffic rules in order: query parameters first, then cookies, then headers. The first match wins and forces that alias. This is the path that powers `?version=headline-urgency` preview links and segment overrides like `Cookie: plan=enterprise`.
+5. **Random branch — weighted pick.** With no cookie and no matching rule, BFFless rolls a weighted random number across the configured splits. For weights `[34, 33, 33]` the math is exactly what you'd expect: 34% of new visitors land on the first alias, 33% on each of the other two.
+6. **Alias resolution.** Aliases are mutable pointers — `landing-headline-urgency` resolves to whichever immutable deployment SHA is currently promoted to it, plus an optional **path override** if the variant lives in a subfolder of a single shared deployment instead of its own branch build.
+7. **Config returns SHA + path.** The domain config hands back the resolved deployment coordinates: the commit SHA (e.g. `abc123`) and the path prefix (e.g. `/dist`). Together these form the storage key prefix for every file in that variant.
+8. **Storage fetch.** BFFless requests the file from whichever storage backend you've configured — S3, GCS, Azure Blob, MinIO, or the local filesystem — using the key `owner/repo/abc123/dist/index.html`. The storage adapter is pluggable; the routing logic above doesn't care which one is wired up.
+9. **Bytes back.** The storage backend returns the raw file contents. BFFless streams them through without rewriting HTML or injecting any runtime — what was in your `dist/` folder is what the visitor gets.
+10. **Response with cookie + header.** BFFless writes the body back to the visitor along with `Set-Cookie: __bffless_variant=headline-urgency` (so the next request is sticky) and `X-Variant: headline-urgency` (so your edge logs, analytics, and curl debugging can see which variant was served without parsing cookies).
 
 That's the whole mechanism. Nothing you put in front of it — routing, caching, rules, previews — requires a new SDK or a new plan tier.
 
