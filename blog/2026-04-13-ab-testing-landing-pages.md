@@ -20,7 +20,7 @@ This post is about wiring that router in front of your existing build pipeline. 
 :::info This post is itself an A/B test
 Meta moment: the page you're reading right now is being served by the exact mechanism it describes. We deployed two versions of this article as separate aliases (`main` and `blog-git-native`) and BFFless is splitting traffic 50/50 between them. You're currently reading the **`git-native`** variant — same takeaway as the other one, just framed for devs first instead of PPC operators.
 
-Want to see the original? [Switch to `?variant=default`](?variant=default). To pin yourself to this version, use [`?variant=git-native`](?variant=git-native). The `__bffless_variant` cookie will keep you on whichever you land on so the rest of the post stays consistent. Open in an incognito window to get re-rolled.
+Want to see the original? <a href="/blog/ab-testing-landing-pages/?variant=default">Switch to <code>?variant=default</code></a>. To pin yourself to this version, use <a href="/blog/ab-testing-landing-pages/?variant=git-native"><code>?variant=git-native</code></a>. The `__bffless_variant` cookie will keep you on whichever you land on so the rest of the post stays consistent. Open in an incognito window to get re-rolled.
 :::
 
 <img src="/img/ab-test-split-v2.png" alt="Two variants of this blog post shown side-by-side in the BFFless blog index, each with its own hero image — left titled 'A/B Testing Landing Pages Without the Enterprise Price Tag' with a 50/50 traffic-split illustration, right titled 'Your Git Branches Are Already A/B Test Variants' with a git-branches-to-edge illustration" />
