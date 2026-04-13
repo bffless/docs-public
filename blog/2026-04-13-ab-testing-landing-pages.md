@@ -7,6 +7,8 @@ image: /img/ab-test-variant-hero.png
 description: Skip Unbounce. Make every git branch a deployable landing-page variant, split traffic at the edge, and read a cookie to attribute conversions.
 ---
 
+import LikeButton from '@site/src/components/LikeButton';
+
 <img src="/img/ab-test-variant-hero.png" alt="A horizontal git commit graph on a dark navy grid: a single trunk with three branches diverging upward in purple, teal, and coral, each ending in a small wireframe landing-page mockup, with a glowing 'edge' box on the right connecting thin lines to all three branch endpoints" />
 
 If you've ever shipped a landing page from a `dist/` folder, you already have the hard parts of an A/B testing platform. You have build artifacts. You have branches. You have a CI pipeline that knows how to push them somewhere. The thing you're missing — the thing Unbounce and Instapage charge $200–$600/month for — is a router that picks one of those builds per visitor and remembers the choice. That's it. That's the whole feature.
@@ -209,3 +211,5 @@ There's a live traffic-splitting demo running at [demo.docs.bffless.app](https:/
 If you want to go deeper, the [A/B testing recipe](/recipes/ab-testing) walks through the GitHub Actions setup, analytics integrations for GA4, Mixpanel, and Pendo, and the full cookie behavior. The [traffic splitting reference](/features/traffic-splitting) covers weights, rules, and canary rollouts in detail.
 
 Spin up an instance, point a client's landing page at it, and see what your experiment velocity looks like when variants are free.
+
+<LikeButton slug="ab-testing-landing-pages" />
