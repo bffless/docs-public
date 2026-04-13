@@ -1,0 +1,19 @@
+announcement:
+  label: Announcement
+  permalink: /announcement
+  description: Official announcements from the BFFless team
+
+features:
+  label: Features
+  permalink: /features
+  description: New features and capabilities
+
+updates:
+  label: Updates
+  permalink: /updates
+  description: Platform updates and improvements
+
+cro:
+  label: CRO
+  permalink: /cro
+  description: Conversion rate optimization, A/B testing, and landing page experiments

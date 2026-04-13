@@ -135,18 +135,20 @@ docker compose restart backend
 
 The backend will register the Google OAuth provider with SuperTokens on startup when these environment variables are set.
 
-### Step 3: Enable the Feature Flag
+### Step 3: Enable Google OAuth
 
-After configuring credentials, enable Google OAuth in your workspace:
+After configuring credentials and restarting, enable Google OAuth using either method:
 
+**Option A: Admin UI**
 1. Navigate to **Settings** > **Authentication** in the admin panel
 2. Toggle **Google OAuth** to enabled
 
-Alternatively, set the environment variable:
-
+**Option B: Environment variable**
 ```env
 FEATURE_GOOGLE_OAUTH=true
 ```
+
+This uses the built-in feature flag system — the `FEATURE_*` env vars are already supported for all flags.
 
 ### How It Works
 
