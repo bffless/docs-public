@@ -38,7 +38,15 @@ const config: Config = {
           sidebarPath: './sidebars.ts',
           routeBasePath: '/',
         },
-        blog: false,
+        blog: {
+          showReadingTime: true,
+          feedOptions: {
+            type: ['rss', 'atom'],
+            xslt: true,
+          },
+          blogTitle: 'BFFless Blog',
+          blogDescription: 'News and updates from the BFFless team',
+        },
         theme: {
           customCss: './src/css/custom.css',
         },
@@ -71,6 +79,11 @@ const config: Config = {
           sidebarId: 'docsSidebar',
           position: 'left',
           label: 'Documentation',
+        },
+        {
+          to: '/blog',
+          label: 'Blog',
+          position: 'left',
         },
         {
           href: 'https://discord.gg/BAYKm5Kv',
