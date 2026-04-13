@@ -7,6 +7,8 @@ image: /img/ab-test-main-hero.png
 description: How PPC agencies and CRO teams can run landing-page A/B tests on BFFless — git-native, any framework, no per-page pricing.
 ---
 
+import LikeButton from '@site/src/components/LikeButton';
+
 <img src="/img/ab-test-main-hero.png" alt="Two browser-window mockups side by side over a dark navy grid floor — one with a purple CTA button, one with a red CTA button — connected by a glowing horizontal beam carrying small pixelated traffic packets split 50/50 between them" />
 
 If you run Google Ads for a living, you already know the drill. You want to test three headlines and two hero images, you open Unbounce or Instapage, and within twenty minutes you're deciding whether this experiment is worth bumping the plan tier for. A/B testing is the feature that actually moves CPA — and it's the feature every landing page builder puts behind their highest-priced plan.
@@ -209,3 +211,5 @@ There's a live traffic-splitting demo running at [demo.docs.bffless.app](https:/
 If you want to go deeper, the [A/B testing recipe](/recipes/ab-testing) walks through the GitHub Actions setup, analytics integrations for GA4, Mixpanel, and Pendo, and the full cookie behavior. The [traffic splitting reference](/features/traffic-splitting) covers weights, rules, and canary rollouts in detail.
 
 Spin up an instance, point a client's landing page at it, and see what your experiment velocity looks like when variants are free.
+
+<LikeButton slug="ab-testing-landing-pages" />
