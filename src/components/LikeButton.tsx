@@ -78,7 +78,7 @@ export default function LikeButton({slug}: LikeButtonProps) {
       style={{
         display: 'flex',
         justifyContent: 'center',
-        margin: '3rem 0 2rem',
+        margin: '1.5rem 0 0.5rem',
       }}
     >
       <button
@@ -88,21 +88,28 @@ export default function LikeButton({slug}: LikeButtonProps) {
         aria-pressed={liked}
         style={{
           appearance: 'none',
-          border: `1px solid ${liked ? 'var(--ifm-color-primary)' : 'var(--ifm-color-emphasis-400)'}`,
-          background: liked ? 'var(--ifm-color-primary)' : 'transparent',
+          border: '1px solid var(--ifm-color-primary)',
+          background: liked ? 'transparent' : 'var(--ifm-color-primary)',
           color: liked
-            ? 'var(--ifm-color-white, #fff)'
-            : 'var(--ifm-color-emphasis-900)',
-          padding: '0.75rem 1.5rem',
+            ? 'var(--ifm-color-primary)'
+            : 'var(--ifm-color-white, #fff)',
+          padding: '1rem 2.5rem',
           borderRadius: '4px',
-          fontSize: '1rem',
-          fontWeight: 500,
+          fontSize: '1.125rem',
+          fontWeight: 600,
+          letterSpacing: '0.01em',
           cursor: liked || busy ? 'default' : 'pointer',
-          opacity: busy && !liked ? 0.6 : 1,
-          transition: 'background 0.15s, color 0.15s, border-color 0.15s',
+          opacity: busy && !liked ? 0.7 : 1,
+          boxShadow: liked ? 'none' : '0 1px 2px rgba(0, 0, 0, 0.12)',
+          transition:
+            'background 0.15s, color 0.15s, box-shadow 0.15s, border-color 0.15s',
         }}
       >
-        {liked ? '♥ Liked' : posting ? '…' : '♡ Like this post'}
+        {liked
+          ? '✓ Liked — thanks!'
+          : posting
+            ? '…'
+            : '♥ Like this post'}
       </button>
     </div>
   );
