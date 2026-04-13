@@ -3,8 +3,11 @@ slug: ab-testing-landing-pages
 title: A/B Testing Landing Pages Without the Enterprise Price Tag
 authors: [bffless-team]
 tags: [features, cro]
+image: /img/ab-test-main-hero.png
 description: How PPC agencies and CRO teams can run landing-page A/B tests on BFFless — git-native, any framework, no per-page pricing.
 ---
+
+<img src="/img/ab-test-main-hero.png" alt="Two browser-window mockups side by side over a dark navy grid floor — one with a purple CTA button, one with a red CTA button — connected by a glowing horizontal beam carrying small pixelated traffic packets split 50/50 between them" />
 
 If you run Google Ads for a living, you already know the drill. You want to test three headlines and two hero images, you open Unbounce or Instapage, and within twenty minutes you're deciding whether this experiment is worth bumping the plan tier for. A/B testing is the feature that actually moves CPA — and it's the feature every landing page builder puts behind their highest-priced plan.
 
