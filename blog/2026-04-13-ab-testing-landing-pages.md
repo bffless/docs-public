@@ -1,26 +1,26 @@
 ---
 slug: ab-testing-landing-pages
-title: A/B Testing Landing Pages Without the Enterprise Price Tag
+title: Your Git Branches Are Already A/B Test Variants
 authors: [bffless-team]
 tags: [features, cro]
-description: How PPC agencies and CRO teams can run landing-page A/B tests on BFFless — git-native, any framework, no per-page pricing.
+description: Skip Unbounce. Make every git branch a deployable landing-page variant, split traffic at the edge, and read a cookie to attribute conversions.
 ---
 
-If you run Google Ads for a living, you already know the drill. You want to test three headlines and two hero images, you open Unbounce or Instapage, and within twenty minutes you're deciding whether this experiment is worth bumping the plan tier for. A/B testing is the feature that actually moves CPA — and it's the feature every landing page builder puts behind their highest-priced plan.
+If you've ever shipped a landing page from a `dist/` folder, you already have the hard parts of an A/B testing platform. You have build artifacts. You have branches. You have a CI pipeline that knows how to push them somewhere. The thing you're missing — the thing Unbounce and Instapage charge $200–$600/month for — is a router that picks one of those builds per visitor and remembers the choice. That's it. That's the whole feature.
 
-This post is about the other way to do it: deploy each variant as a static site, split traffic at the edge, and read a cookie to attribute conversions. No per-page pricing, no template jail, works with whatever stack your team already ships.
+This post is about wiring that router in front of your existing build pipeline. Each variant stays a normal git branch with a normal build artifact. BFFless splits traffic across them at the edge and sets a cookie so visitors stay sticky. No SDK, no template lock-in, no per-page pricing.
 
 <!-- truncate -->
 
 :::info This post is itself an A/B test
-Meta moment: the page you're reading right now is being served by the exact mechanism it describes. We deployed two versions of this article as separate aliases (`blog-main` and `blog-git-native`) and BFFless is splitting traffic 50/50 between them. The headline, the lede, and a few paragraphs differ — same takeaway, different angle.
+Meta moment: the page you're reading right now is being served by the exact mechanism it describes. We deployed two versions of this article as separate aliases (`blog-main` and `blog-git-native`) and BFFless is splitting traffic 50/50 between them. You're currently reading the **`git-native`** variant — same takeaway as the other one, just framed for devs first instead of PPC operators.
 
-Want to see the other variant? Append `?version=git-native` to the URL. To force the original, use `?version=main`. The `__bffless_variant` cookie will keep you on whichever you land on so the rest of the post stays consistent. Open in an incognito window to get re-rolled.
+Want to see the original? Append `?version=main` to the URL. To pin yourself to this version, use `?version=git-native`. The `__bffless_variant` cookie will keep you on whichever you land on so the rest of the post stays consistent. Open in an incognito window to get re-rolled.
 :::
 
-## The PPC experimentation problem
+## The "just give me a router" problem
 
-Drag-and-drop builders are great at what they do. But when you scale landing pages across a dozen client accounts, the same pain points show up every time:
+Drag-and-drop builders are great at what they do. But the moment your team has a real frontend stack — a design system, a component library, a Next.js or Astro setup that already builds into `dist/` — the same friction points show up every time you try to plug a builder into your workflow:
 
 - **A/B testing is a premium feature.** Unbounce's Smart Traffic, Instapage's experimentation suite, and Leadpages' split testing all sit on plans that run $200–$600/month per seat before you're testing at any real volume.
 - **Templates cap what you can ship.** Custom components, design systems, and anything your frontend team has already built in React or Astro tend not to survive the round-trip through a WYSIWYG editor.
@@ -29,11 +29,11 @@ Drag-and-drop builders are great at what they do. But when you scale landing pag
 
 None of these are fatal on their own. Stack them together and you end up paying a premium tool to do a job that mostly consists of serving HTML.
 
-## Why static hosting fits PPC landing pages
+## Why a build artifact is the right primitive
 
-Paid landing pages are the ideal case for static hosting. They're small, they're read-heavy, and the two metrics that matter most — Quality Score and conversion rate — both reward raw page speed. Shipping a landing page as a pre-built bundle gives you the fastest TTFB and LCP you can physically achieve, and it scales to any traffic spike without autoscaling config.
+Landing pages are the ideal case for "just ship the bundle". They're small, they're read-heavy, and the two metrics that matter most — Quality Score for paid traffic and conversion rate for everything else — both reward raw page speed. A pre-built bundle gives you the fastest TTFB and LCP you can physically achieve, and it scales to any traffic spike without an autoscaler.
 
-It also means your designers and devs keep shipping in the tools they already use. Next.js, Astro, Eleventy, Hugo, a folder full of HTML — doesn't matter. Each variant is just another build artifact.
+The other reason it's the right primitive is that you already have one. Whatever your team builds in — Next.js, Astro, Eleventy, Hugo, a folder full of HTML — produces a directory that can be served as-is. Each variant is just another version of that directory.
 
 The missing piece is usually traffic splitting. That's what BFFless adds on top.
 
