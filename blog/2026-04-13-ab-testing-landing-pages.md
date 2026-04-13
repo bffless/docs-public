@@ -212,4 +212,20 @@ If you want to go deeper, the [A/B testing recipe](/recipes/ab-testing) walks th
 
 Spin up an instance, point a client's landing page at it, and see what your experiment velocity looks like when variants are free.
 
+<div style={{
+  margin: '4rem 0 2rem',
+  padding: '2rem 1.75rem 1.25rem',
+  borderRadius: '4px',
+  background: 'var(--ifm-color-emphasis-100)',
+  border: '1px solid var(--ifm-color-emphasis-200)',
+}}>
+
+#### The button is part of the experiment
+
+You just read a post about measuring A/B test variants with a server-side state pipeline. The **Like** button below writes a row to the exact `blog_post_likes` schema this post describes, tagged with whichever variant BFFless served you — the post is measuring itself. You made it this far; that's already the interesting part of the signal. The click is the rest of it.
+
+We'll publish a follow-up with the numbers in a couple of weeks: which headline won, likes per variant, bounce-rate deltas, and what the raw `db_aggregate { groupBy: "variant" }` output looked like against real traffic. If the post was useful, the button is how we hear it.
+
 <LikeButton slug="ab-testing-landing-pages" />
+
+</div>
