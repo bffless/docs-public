@@ -19,15 +19,24 @@ flowchart TB
     end
 
     subgraph Project["Project Roles (Per-Project)"]
-        owner[Owner]
-        padmin[Admin]
-        contributor[Contributor]
-        viewer[Viewer]
+        owner["Owner (4)"]
+        padmin["Admin (3)"]
+        contributor["Contributor (2)"]
+        viewer["Viewer (1)"]
+        guest["Guest (0)"]
     end
 
-    admin --> |"can access"| owner
-    user --> |"can be granted"| padmin
-    member --> |"can be granted"| viewer
+    admin -->|"full access"| owner
+    user -->|"can be granted"| padmin
+    user -->|"can be granted"| contributor
+    member -->|"can be granted"| viewer
+    member -->|"can be granted"| guest
+
+    style guest fill:#fef3c7,stroke:#d97706,color:#92400e
+    style viewer fill:#f3f4f6,stroke:#6b7280,color:#374151
+    style contributor fill:#d1fae5,stroke:#059669,color:#065f46
+    style padmin fill:#dbeafe,stroke:#2563eb,color:#1e40af
+    style owner fill:#ede9fe,stroke:#7c3aed,color:#5b21b6
 ```
 
 ## Global Roles
@@ -78,14 +87,15 @@ Project roles control access to individual projects. Users can have different ro
 | **Owner** | 4 | Full control, transfer ownership, delete project |
 | **Admin** | 3 | Manage permissions, all read/write operations |
 | **Contributor** | 2 | Create deployments, upload assets, modify content |
-| **Viewer** | 1 | Read-only access, view deployments and files |
+| **Viewer** | 1 | Read-only access to admin backend, view deployments and files |
+| **Guest** | 0 | Site access only, no admin backend access |
 
 ### Role Hierarchy
 
 Roles are hierarchical—higher roles include all permissions of lower roles:
 
 ```
-Owner (4) → Admin (3) → Contributor (2) → Viewer (1)
+Owner (4) → Admin (3) → Contributor (2) → Viewer (1) → Guest (0)
 ```
 
 For example, a user with **Admin** role automatically has all **Contributor** and **Viewer** permissions.
@@ -121,12 +131,21 @@ Contributors can:
 
 ### Viewer
 
-Viewers have read-only access:
+Viewers have read-only access to the admin backend:
 
 - View deployments and their status
 - Browse uploaded files
 - View traffic configuration
 - Cannot modify anything
+
+### Guest
+
+Guests can access private site content but have no admin backend access:
+
+- Can log in and view private deployments via the public URL
+- Cannot see the admin dashboard, repository list, or settings
+- Ideal for end users of private sites (e.g., event guests, clients)
+- Use the project's "Required Role" setting with "Guest or higher" to restrict access to invited guests only
 
 ## Permission Sources
 
@@ -163,7 +182,7 @@ When a user has permissions from multiple sources, they receive the **highest** 
 
 ## API Key Access
 
-API keys provide programmatic access for CI/CD pipelines and automation.
+API keys provide programmatic access for CI/CD pipelines and automation. Only **admin** global role users can create and manage API keys.
 
 ### Project-Scoped Keys
 
@@ -238,19 +257,20 @@ You will become an admin after transferring ownership.
 
 ## Permission Matrix
 
-| Action | Owner | Admin | Contributor | Viewer |
-|--------|:-----:|:-----:|:-----------:|:------:|
-| View project | Yes | Yes | Yes | Yes |
-| View deployments | Yes | Yes | Yes | Yes |
-| Browse files | Yes | Yes | Yes | Yes |
-| Create deployment | Yes | Yes | Yes | - |
-| Delete deployment | Yes | Yes | - | - |
-| Configure traffic | Yes | Yes | Yes | - |
-| Manage domains | Yes | Yes | - | - |
-| Manage settings | Yes | Yes | - | - |
-| Grant permissions | Yes | Yes | - | - |
-| Delete project | Yes | - | - | - |
-| Transfer ownership | Yes | - | - | - |
+| Action | Owner | Admin | Contributor | Viewer | Guest |
+|--------|:-----:|:-----:|:-----------:|:------:|:-----:|
+| Access private site content | Yes | Yes | Yes | Yes | Yes |
+| View admin backend | Yes | Yes | Yes | Yes | - |
+| View deployments | Yes | Yes | Yes | Yes | - |
+| Browse files | Yes | Yes | Yes | Yes | - |
+| Create deployment | Yes | Yes | Yes | - | - |
+| Delete deployment | Yes | Yes | - | - | - |
+| Configure traffic | Yes | Yes | Yes | - | - |
+| Manage domains | Yes | Yes | - | - | - |
+| Manage settings | Yes | Yes | - | - | - |
+| Grant permissions | Yes | Yes | - | - | - |
+| Delete project | Yes | - | - | - | - |
+| Transfer ownership | Yes | - | - | - | - |
 
 ## User Groups
 
@@ -282,7 +302,8 @@ Groups simplify permission management for teams:
 
 Grant the minimum permissions needed:
 
-- Use **viewer** for stakeholders who only need to see deployments
+- Use **guest** for end users who only need to access private site content
+- Use **viewer** for stakeholders who need read-only admin access
 - Use **contributor** for developers who deploy but don't manage access
 - Reserve **admin** for team leads who manage permissions
 
