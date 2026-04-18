@@ -19,16 +19,24 @@ flowchart TB
     end
 
     subgraph Project["Project Roles (Per-Project)"]
-        owner[Owner]
-        padmin[Admin]
-        contributor[Contributor]
-        viewer[Viewer]
-        guest[Guest]
+        owner["Owner (4)"]
+        padmin["Admin (3)"]
+        contributor["Contributor (2)"]
+        viewer["Viewer (1)"]
+        guest["Guest (0)"]
     end
 
-    admin --> |"can access"| owner
-    user --> |"can be granted"| padmin
-    member --> |"can be granted"| guest
+    admin -->|"full access"| owner
+    user -->|"can be granted"| padmin
+    user -->|"can be granted"| contributor
+    member -->|"can be granted"| viewer
+    member -->|"can be granted"| guest
+
+    style guest fill:#fef3c7,stroke:#d97706,color:#92400e
+    style viewer fill:#f3f4f6,stroke:#6b7280,color:#374151
+    style contributor fill:#d1fae5,stroke:#059669,color:#065f46
+    style padmin fill:#dbeafe,stroke:#2563eb,color:#1e40af
+    style owner fill:#ede9fe,stroke:#7c3aed,color:#5b21b6
 ```
 
 ## Global Roles
