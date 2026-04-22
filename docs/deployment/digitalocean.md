@@ -33,10 +33,13 @@ Add these DNS records pointing to your Droplet IP:
 
 | Type | Name | Value |
 |------|------|-------|
-| A | @ | YOUR_DROPLET_IP |
-| A | www | YOUR_DROPLET_IP |
-| A | admin | YOUR_DROPLET_IP |
-| A | minio | YOUR_DROPLET_IP |
+| A | `@` | `YOUR_DROPLET_IP` |
+| A | `*` | `YOUR_DROPLET_IP` |
+
+:::info Why Two Records?
+- `@` covers your root domain (`yourdomain.com`)
+- `*` is a wildcard that covers all subdomains (`admin.yourdomain.com`, `www.yourdomain.com`, `mysite.yourdomain.com`, etc.)
+:::
 
 Wait 5-30 minutes for propagation.
 

@@ -55,8 +55,7 @@ API keys can be scoped to a specific project or granted global access. For AI as
 #### Claude Code
 
 ```bash
-claude mcp add bffless -t http \
-  --url https://admin.your-instance.example.com/mcp \
+claude mcp add --transport http bffless https://admin.yourdomain.com/mcp \
   --header "X-API-Key: YOUR_API_KEY"
 ```
 
@@ -67,7 +66,7 @@ This adds the server to your `~/.claude.json` configuration:
   "mcpServers": {
     "bffless": {
       "type": "http",
-      "url": "https://admin.your-instance.example.com/mcp",
+      "url": "https://admin.yourdomain.com/mcp",
       "headers": {
         "X-API-Key": "YOUR_API_KEY"
       }
@@ -81,7 +80,7 @@ This adds the server to your `~/.claude.json` configuration:
 Add the following to your MCP client configuration:
 
 - **Transport:** Streamable HTTP
-- **URL:** `https://admin.your-instance.example.com/mcp`
+- **URL:** `https://admin.yourdomain.com/mcp`
 - **Header:** `X-API-Key: YOUR_API_KEY`
 
 ### 3. Verify the Connection
@@ -97,12 +96,10 @@ The assistant will call the `list_projects` tool and return your project list.
 You can connect to multiple BFFless instances simultaneously by giving each a unique name:
 
 ```bash
-claude mcp add bffless-production -t http \
-  --url https://admin.production.example.com/mcp \
+claude mcp add --transport http bffless-production https://admin.production.yourdomain.com/mcp \
   --header "X-API-Key: PROD_KEY"
 
-claude mcp add bffless-staging -t http \
-  --url https://admin.staging.example.com/mcp \
+claude mcp add --transport http bffless-staging https://admin.staging.yourdomain.com/mcp \
   --header "X-API-Key: STAGING_KEY"
 ```
 
